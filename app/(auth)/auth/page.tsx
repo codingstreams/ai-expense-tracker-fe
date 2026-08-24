@@ -1,12 +1,21 @@
 'use client';
 
-import { useState } from 'react';
-import { Sparkles, ArrowRight, ShieldCheck, Zap } from 'lucide-react';
+import { Sparkles, ArrowRight, Zap } from 'lucide-react';
 import LoginForm from '@/components/LoginForm';
 import RegisterForm from '@/components/RegisterForm';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function AuthPage() {
-  const [isLogin, setIsLogin] = useState(true);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  
+  // Default to 'login' if mode is missing or invalid
+  const mode = searchParams.get('mode') || 'login';
+  const isLogin = mode === 'login';
+
+  const switchMode = (newMode: 'login' | 'register') => {
+    router.push(`/auth?mode=${newMode}`);
+  };
 
   return (
     <div className="flex min-h-screen w-full bg-zinc-950 text-zinc-100">
@@ -53,7 +62,7 @@ export default function AuthPage() {
               <p>
                 Don&apos;t have an account?{' '}
                 <button
-                  onClick={() => setIsLogin(false)}
+                 onClick={() => switchMode('register')}
                   className="font-medium text-indigo-400 hover:underline inline-flex items-center gap-1"
                 >
                   Sign up <ArrowRight className="h-3 w-3" />
@@ -63,7 +72,7 @@ export default function AuthPage() {
               <p>
                 Already have an account?{' '}
                 <button
-                  onClick={() => setIsLogin(true)}
+                onClick={() => switchMode('login')}
                   className="font-medium text-indigo-400 hover:underline inline-flex items-center gap-1"
                 >
                   Sign in <ArrowRight className="h-3 w-3" />
