@@ -4,8 +4,6 @@ import { Sparkles, ArrowRight, Zap } from 'lucide-react';
 import LoginForm from '@/components/auth/LoginForm';
 import RegisterForm from '@/components/auth/RegisterForm';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useAuthStore } from '@/store/useAuthStore';
-import { useEffect } from 'react';
 
 export default function AuthPage() {
   const router = useRouter();

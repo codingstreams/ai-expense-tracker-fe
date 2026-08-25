@@ -7,6 +7,7 @@ export function middleware(request: NextRequest) {
   const authCookie = request.cookies.get('auth-storage')?.value;
   let token = null;
   let isExpired = false;
+  let isOnbaorded = false;
 
   if (authCookie) {
     try {
@@ -15,6 +16,7 @@ export function middleware(request: NextRequest) {
 
       if (authData) {
         token = authData.accessToken;
+        isOnbaorded = authData.isOnbaorded;
         
         if (Date.now() >= authData.expireAt) {
           isExpired = true;
@@ -25,7 +27,7 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  if (pathname.startsWith('/dashboard') && (!token || isExpired)) {
+  if ((pathname.startsWith('/dashboard') || pathname.startsWith('/onboarding')) && (!token || isExpired)) {
     const response = NextResponse.redirect(new URL('/auth?mode=login', request.url));
     
     if (isExpired) {
@@ -34,13 +36,13 @@ export function middleware(request: NextRequest) {
     return response;
   }
 
-  if (pathname.startsWith('/auth') && token && !isExpired) {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+  if (pathname.startsWith('/auth') && token && !isExpired ) {
+    return NextResponse.redirect(new URL(isOnbaorded ?'/dashboard':'/onboarding', request.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/auth'],
+  matcher: ['/dashboard/:path*', '/auth', '/onboarding'],
 };
