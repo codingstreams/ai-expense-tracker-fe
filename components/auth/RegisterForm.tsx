@@ -27,7 +27,8 @@ export default function RegisterForm() {
     try {
       const { auth, user } = await authService.register(data);
       setAuth(auth, user);
-      router.push('/dashboard');
+      // router.push('/dashboard');
+      router.push(user.isOnboardingComplete?'/dashboard':'/onboarding');
     } catch (error) {
       console.error('Registration failed:', error);
     }

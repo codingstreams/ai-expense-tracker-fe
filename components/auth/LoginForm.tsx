@@ -21,13 +21,19 @@ export default function LoginForm() {
     formState: { errors, isSubmitting },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "akshay@codingstreams.in",
+      password: "test@1234"
+    }
   });
 
   const onSubmit = async (data: LoginFormValues) => {
     try {
+
       const { auth, user } = await authService.login(data);
       setAuth(auth, user);
-      router.push('/dashboard');
+
+      router.push(user.isOnboardingComplete ? '/dashboard' : '/onboarding');
     } catch (error) {
       console.error('Login failed:', error);
     }

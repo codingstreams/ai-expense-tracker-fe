@@ -22,7 +22,7 @@ export async function apiClient<T>(
       if (token) {
         headers.set('Authorization', `${tokenType} ${token}`);
       } else {
-        console.warn('No valid auth token found for secure endpoint');
+        console.warn('No valid auth token found for secure endpoint. Endpoint: '+endpoint);
       }
     } catch (e) {
       console.error('Failed to append authorization header', e);

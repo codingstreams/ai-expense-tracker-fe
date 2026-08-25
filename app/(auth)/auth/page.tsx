@@ -1,11 +1,12 @@
 'use client';
 
+import { Suspense } from 'react';
 import { Sparkles, ArrowRight, Zap } from 'lucide-react';
 import LoginForm from '@/components/auth/LoginForm';
 import RegisterForm from '@/components/auth/RegisterForm';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function AuthPage() {
+function AuthContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -46,7 +47,6 @@ export default function AuthPage() {
 
       <div className="flex w-full lg:w-1/2 flex-col justify-center items-center px-6 py-12 lg:px-16">
         <div className="w-full max-w-md space-y-6">
-
           <div className="flex lg:hidden items-center gap-2 mb-6">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600/20 text-indigo-400">
               <Sparkles className="h-4 w-4" />
@@ -82,5 +82,13 @@ export default function AuthPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AuthPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen w-full bg-zinc-950" />}>
+      <AuthContent />
+    </Suspense>
   );
 }

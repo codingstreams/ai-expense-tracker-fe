@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const authCookie = request.cookies.get('auth-storage')?.value;
   let token = null;
   let isExpired = false;
-  let isOnbaorded = false;
+  let isOnboarded = false;
 
   if (authCookie) {
     try {
@@ -16,7 +16,7 @@ export function middleware(request: NextRequest) {
 
       if (authData) {
         token = authData.accessToken;
-        isOnbaorded = authData.isOnbaorded;
+        isOnboarded = authData.isOnbaorded;
         
         if (Date.now() >= authData.expireAt) {
           isExpired = true;
@@ -37,7 +37,7 @@ export function middleware(request: NextRequest) {
   }
 
   if (pathname.startsWith('/auth') && token && !isExpired ) {
-    return NextResponse.redirect(new URL(isOnbaorded ?'/dashboard':'/onboarding', request.url));
+    return NextResponse.redirect(new URL(isOnboarded ?'/dashboard':'/onboarding', request.url));
   }
 
   return NextResponse.next();
