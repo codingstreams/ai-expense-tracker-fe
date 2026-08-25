@@ -11,10 +11,8 @@ export default function RootPage() {
 
   useEffect(() => {
     if (auth) {
-      console.log('going to dashboard');
       router.replace('/dashboard');
     } else {
-      console.log('going to auth');
       router.replace('/auth?mode=login');
     }
   }, [auth, router]);

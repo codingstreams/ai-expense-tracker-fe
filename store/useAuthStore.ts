@@ -1,7 +1,13 @@
-// store/useAuthStore.ts
 import { AuthResponseDto, UserDto } from '@/types/auth.dto';
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, StateStorage, createJSONStorage } from 'zustand/middleware';
+import Cookies from 'js-cookie';
+
+const cookieStorage: StateStorage = {
+  getItem: (name) => Cookies.get(name) || null,
+  setItem: (name, value) => Cookies.set(name, value, { expires: 7 }), // expires in 7 days
+  removeItem: (name) => Cookies.remove(name),
+};
 
 interface AuthState {
   auth: AuthResponseDto | null;
@@ -20,6 +26,7 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-storage',
+      storage: createJSONStorage(() => cookieStorage),
     }
   )
 );

@@ -4,12 +4,21 @@ import { Sparkles, ArrowRight, Zap } from 'lucide-react';
 import LoginForm from '@/components/LoginForm';
 import RegisterForm from '@/components/RegisterForm';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useAuthStore } from '@/store/useAuthStore';
+import { useEffect } from 'react';
 
 export default function AuthPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  
-  // Default to 'login' if mode is missing or invalid
+
+  const auth = useAuthStore((state) => state.auth);
+
+  useEffect(() => {
+    if (auth) {
+      router.replace('/dashboard');
+    }
+  }, [auth, router]);
+
   const mode = searchParams.get('mode') || 'login';
   const isLogin = mode === 'login';
 
@@ -62,7 +71,7 @@ export default function AuthPage() {
               <p>
                 Don&apos;t have an account?{' '}
                 <button
-                 onClick={() => switchMode('register')}
+                  onClick={() => switchMode('register')}
                   className="font-medium text-indigo-400 hover:underline inline-flex items-center gap-1"
                 >
                   Sign up <ArrowRight className="h-3 w-3" />
@@ -72,7 +81,7 @@ export default function AuthPage() {
               <p>
                 Already have an account?{' '}
                 <button
-                onClick={() => switchMode('login')}
+                  onClick={() => switchMode('login')}
                   className="font-medium text-indigo-400 hover:underline inline-flex items-center gap-1"
                 >
                   Sign in <ArrowRight className="h-3 w-3" />
