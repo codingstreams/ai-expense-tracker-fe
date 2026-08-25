@@ -1,10 +1,11 @@
-'use client';
+"use client";
 
-import { useAuthStore } from '@/store/useAuthStore';
-import { useState, useEffect } from 'react';
+import { useAuthStore } from "@/store/useAuthStore";
+import { useState, useEffect } from "react";
 
 export default function UserGreetings() {
   const [isMounted, setIsMounted] = useState(false);
+  const name = useAuthStore((state) => state.user?.name || "");
 
   useEffect(() => {
     setIsMounted(true);
@@ -13,32 +14,21 @@ export default function UserGreetings() {
   if (!isMounted) {
     return (
       <div>
-        <h1 className="text-xl font-semibold">Hello!</h1>
-        <p className="text-zinc-400">Welcome to your dashboard.</p>
+        <h1 className="text-lg sm:text-xl font-bold text-white tracking-tight">Hello!</h1>
+        <p className="text-xs text-zinc-400">Welcome to your dashboard</p>
       </div>
     );
   }
 
-  const state = useAuthStore.getState();
-  const name = state.user?.name || '';
-
   const currentHour = new Date().getHours();
-  let timeGreeting = 'Hello';
-
-  if (currentHour < 12) {
-    timeGreeting = 'Good morning';
-  } else if (currentHour < 18) {
-    timeGreeting = 'Good afternoon';
-  } else {
-    timeGreeting = 'Good evening';
-  }
+  const timeGreeting = currentHour < 12 ? "Good morning" : currentHour < 18 ? "Good afternoon" : "Good evening";
 
   return (
     <div>
-      <h1 className="text-xl font-semibold">
-        {timeGreeting}{name ? `, ${name}` : ''}!
+      <h1 className="text-lg sm:text-xl font-bold text-white tracking-tight">
+        {timeGreeting}{name ? `, ${name}` : ""}!
       </h1>
-      <p className="text-zinc-400">Welcome to your dashboard.</p>
+      <p className="text-xs text-zinc-400">Welcome to your dashboard</p>
     </div>
   );
 }

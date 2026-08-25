@@ -1,30 +1,55 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation"; 
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
 import UserGreetings from "@/components/dashboard/UserGreetings";
+import QuickActionCommandBar from "@/components/dashboard/QuickActionCommandBar";
+import Summary from "@/components/dashboard/Summary";
+import RecentTransactions from "@/components/dashboard/RecentTransactions";
+import CategorySpend from "@/components/dashboard/CategorySpend";
+import AiChatWidget from "@/components/dashboard/AiChatWidget";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const state = useAuthStore.getState();
-  const isOnboarded = state.auth?.onboarded;
+  const [mounted, setMounted] = useState(false);
+  const isOnboarded = useAuthStore((state) => state.auth?.onboarded);
 
   useEffect(() => {
-    if (!isOnboarded) {
-      router.replace('/onboarding');
-    }
-  }, [isOnboarded, router]);
+    setMounted(true);
+  }, []);
 
-  if (!isOnboarded) {
-    return null; 
+  useEffect(() => {
+    if (mounted && !isOnboarded) {
+      router.replace("/onboarding");
+    }
+  }, [mounted, isOnboarded, router]);
+
+  if (!mounted || !isOnboarded) {
+    return null;
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100">
-      <main className="p-8">
+    <div className="p-6 md:p-8 space-y-6 max-w-7xl mx-auto">
+      <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <UserGreetings />
-      </main>
+        <div className="w-full lg:w-auto lg:min-w-[540px]">
+          <QuickActionCommandBar />
+        </div>
+      </header>
+
+      <Summary />
+
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <div className="lg:col-span-3">
+          <RecentTransactions />
+        </div>
+        <div className="lg:col-span-2">
+          <CategorySpend />
+        </div>
+      </div>
+
+      <AiChatWidget />
     </div>
   );
 }
