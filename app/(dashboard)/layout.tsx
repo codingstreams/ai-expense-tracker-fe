@@ -3,57 +3,20 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { LayoutDashboard, Receipt, PieChart, Settings, Sparkles } from 'lucide-react';
-import LogoutButton from '@/components/LogoutButton';
+import LogoutButton from '@/components/auth/LogoutButton';
+import Sidebar from '@/components/dashboard/Sidebar';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
-const navItems = [
-  { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Expenses', href: '/dashboard/expenses', icon: Receipt },
-  { name: 'Analytics', href: '/dashboard/analytics', icon: PieChart },
-  { name: 'Settings', href: '/dashboard/settings', icon: Settings },
-];
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
-  const pathname = usePathname();
+  
 
   return (
     <div className="flex min-h-screen bg-zinc-950 text-zinc-100">
-      <aside className="flex w-20 flex-col items-center justify-between border-r border-zinc-800 bg-zinc-900/50 py-8 backdrop-blur-md">
-        <div className="flex flex-col items-center gap-8">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600/20 border border-indigo-500/30 text-indigo-400">
-            <Sparkles className="h-5 w-5" />
-          </div>
-
-          <nav className="flex flex-col gap-3">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = pathname === item.href;
-
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  title={item.name}
-                  className={`flex h-11 w-11 items-center justify-center rounded-xl transition ${
-                    isActive
-                      ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
-                      : 'text-zinc-400 hover:bg-zinc-800/80 hover:text-zinc-200'
-                  }`}
-                >
-                  <Icon className="h-5 w-5" />
-                </Link>
-              );
-            })}
-          </nav>
-        </div>
-
-        <div>
-          <LogoutButton iconOnly/>
-        </div>
-      </aside>
+      <Sidebar/>
 
       <main className="flex-1 overflow-y-auto">
         {children}

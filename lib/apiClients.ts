@@ -1,34 +1,31 @@
-// lib/apiClient.ts
 import { BASE_URL } from '@/config';
-import { AuthResponseDto } from '@/types/auth.dto';
+import { useAuthStore } from '@/store/useAuthStore';
 
 export async function apiClient<T>(
-  endpoint: string, 
+  endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
   const headers = new Headers(options.headers || {});
-  
+
   if (options.body && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json');
   }
 
   const isAuthRoute = endpoint.includes('/auth/');
   if (!isAuthRoute) {
-    const authStorage = localStorage.getItem('auth-storage');
-    if (authStorage) {
-      try {
-        const parsed: {auth:AuthResponseDto} = JSON.parse(authStorage);
-        const token = parsed?.auth?.accessToken;
-        const tokenType = parsed?.auth?.tokenType;
-        // const expireAt = parsed?.auth?.expireAt;
+    try {
+      const store = useAuthStore.getState();
+      const token = store.getToken();
 
+      const tokenType = store.auth?.tokenType || 'Bearer';
 
-        if (token) {
-          headers.set('Authorization', `${tokenType} ${token}`);
-        }
-      } catch (e) {
-        console.error('Failed to parse auth storage', e);
+      if (token) {
+        headers.set('Authorization', `${tokenType} ${token}`);
+      } else {
+        console.warn('No valid auth token found for secure endpoint');
       }
+    } catch (e) {
+      console.error('Failed to append authorization header', e);
     }
   }
 

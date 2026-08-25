@@ -13,15 +13,32 @@ interface AuthState {
   auth: AuthResponseDto | null;
   user: UserDto | null;
   setAuth: (auth: AuthResponseDto, user: UserDto) => void;
+  getToken: ()=>string|null;
   logout: () => void;
 }
 
 export const useAuthStore = create<AuthState>()(
+
   persist(
-    (set) => ({
+    (set, get) => ({
       auth: null,
       user: null,
       setAuth: (auth, user) => set({ auth, user }),
+      getToken: () =>{
+        const authData = get().auth;
+        
+        if (!authData) return null;
+
+        const isExpired = Date.now() >= authData.expireAt;
+
+        if (isExpired) {
+          console.warn("Token expired. Logging out user automatically.");
+          get().logout(); 
+          return null;
+        }
+
+        return authData.accessToken;
+      },
       logout: () => set({ auth: null, user: null }),
     }),
     {

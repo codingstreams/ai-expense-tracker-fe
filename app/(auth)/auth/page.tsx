@@ -1,8 +1,8 @@
 'use client';
 
 import { Sparkles, ArrowRight, Zap } from 'lucide-react';
-import LoginForm from '@/components/LoginForm';
-import RegisterForm from '@/components/RegisterForm';
+import LoginForm from '@/components/auth/LoginForm';
+import RegisterForm from '@/components/auth/RegisterForm';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useEffect } from 'react';
@@ -10,14 +10,6 @@ import { useEffect } from 'react';
 export default function AuthPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-
-  const auth = useAuthStore((state) => state.auth);
-
-  useEffect(() => {
-    if (auth) {
-      router.replace('/dashboard');
-    }
-  }, [auth, router]);
 
   const mode = searchParams.get('mode') || 'login';
   const isLogin = mode === 'login';
