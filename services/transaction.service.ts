@@ -1,5 +1,6 @@
 import { apiClient } from "@/lib/apiClients";
-import { PagedTransactionsDto, TransactionResponseDto } from "@/types/transaction.dto";
+import { AccountDto } from "@/types/onboarding.dto";
+import { CategoryDto, PagedTransactionsDto, TransactionResponseDto } from "@/types/transaction.dto";
 
 export interface TransactionFilterParams {
   page?: number;
@@ -29,11 +30,24 @@ export const transactionService = {
     return await apiClient<PagedTransactionsDto>(endpoint);
   },
 
+  async getCategories() {
+    return await apiClient<CategoryDto[]>('/system-categories');
+  },
+
+
+
   async getRecentTransactions() {
     return await apiClient<TransactionResponseDto[]>('/transactions/recent', {
       headers: {
         'X-API-Version': '2.0',
       },
+    });
+  },
+
+  async createTransaction(payload: any) {
+    return await apiClient<TransactionResponseDto>('/transactions', {
+      method: 'POST',
+      body: JSON.stringify(payload),
     });
   },
 };

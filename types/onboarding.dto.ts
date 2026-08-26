@@ -21,6 +21,7 @@ export interface UserConfigDto {
 }
 
 export interface AccountDto {
+  id?: string;
   lastFourDigits: string;
   balance: number;
   accountType: string;

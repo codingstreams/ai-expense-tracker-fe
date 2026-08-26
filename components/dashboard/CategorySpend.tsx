@@ -23,7 +23,7 @@ export default function CategorySpend() {
         .then(categories => setCategories(categories))
         .catch(() => { })
     }
-  });
+  }, []);
 
   const totalSpent = categories.reduce((acc, c) => acc + c.totalAmount, 0);
 
@@ -55,14 +55,14 @@ export default function CategorySpend() {
                   <span className="font-semibold text-zinc-200">{cat.categoryName}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-zinc-400 text-[11px]">{cat.percentage}%</span>
+                  <span className="text-zinc-400 text-[11px]">{cat.percentage.toFixed(2)}%</span>
                   <span className="font-bold text-white">{formatCurrency(cat.totalAmount)}</span>
                 </div>
               </div>
 
               <div className="h-1.5 w-full bg-zinc-800 rounded-full overflow-hidden">
-                
-                <div className={`h-full ${iconColor.split(' ')[0].replace('900/20','500')} rounded-full transition-all`} style={{ width: `${cat.percentage}%` }} />
+
+                <div className={`h-full ${iconColor.split(' ')[0].replace('900/20', '500')} rounded-full transition-all`} style={{ width: `${cat.percentage}%` }} />
               </div>
             </div>
           );

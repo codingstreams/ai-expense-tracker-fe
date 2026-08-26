@@ -44,3 +44,16 @@ export interface PagedTransactionsDto {
   totalPages: number;
   isLast: boolean;
 }
+
+export interface CategoryDto {
+  id: string;
+  name: string;
+}
+
+export interface CardDto {
+  id: string;
+  lastFourDigits?: string;
+  cardType?: string;
+  name?: string;
+  bank?: { id: string; name: string };
+}

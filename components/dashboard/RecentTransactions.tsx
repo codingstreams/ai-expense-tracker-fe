@@ -9,12 +9,12 @@ import { useEffect, useState } from "react";
 export default function RecentTransactions() {
   const [transactions, setTransactions] = useState<TransactionResponseDto[]>([]);
 
-  useEffect(()=>{
-    if(transactions.length == 0)
-    transactionService.getRecentTransactions()
-    .then(transactions=>setTransactions(transactions))
-    .catch(()=>{})
-  });
+  useEffect(() => {
+    if (transactions.length == 0)
+      transactionService.getRecentTransactions()
+        .then(transactions => setTransactions(transactions))
+        .catch(() => { })
+  }, []);
 
   const formatCurrency = (val: number) => {
     const formatted = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(Math.abs(val));
@@ -42,7 +42,7 @@ export default function RecentTransactions() {
               className="flex items-center justify-between p-3 rounded-xl border border-zinc-800/70 bg-zinc-950/60 hover:bg-zinc-950 transition-colors"
             >
               <div className="flex items-center gap-3 min-w-0">
-                <div className={`p-2.5 rounded-xl border shrink-0 ${isIncome?'bg-emerald-900/20 border-emerald-400':'bg-rose-900/20 border-rose-400'}`}>
+                <div className={`p-2.5 rounded-xl border shrink-0 ${isIncome ? 'bg-emerald-900/20 border-emerald-400' : 'bg-rose-900/20 border-rose-400'}`}>
                   {isIncome ? <ArrowUpRight className="h-3.5 w-3.5 text-emerald-400" /> : <ArrowDownRight className="h-3.5 w-3.5 text-rose-400" />}
                 </div>
                 <div className="min-w-0">
