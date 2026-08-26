@@ -1,15 +1,19 @@
 "use client";
 
-import { ArrowDownRight, ArrowUpRight, ArrowLeftRight, ChevronLeft, ChevronRight, Inbox } from "lucide-react";
+import { ArrowDownRight, ArrowUpRight, ArrowLeftRight, ChevronLeft, ChevronRight, Inbox, Trash2 } from "lucide-react";
 import { PagedTransactionsDto } from "@/types/transaction.dto";
+import { transactionService } from "@/services/transaction.service";
+
+import { useDashboardStore } from "@/store/useDashboardStore";
 
 interface TransactionListProps {
   pagedData: PagedTransactionsDto | null;
   loading: boolean;
   onPageChange: (page: number) => void;
+  onDelete?: (id: string) => void;
 }
 
-export default function TransactionList({ pagedData, loading, onPageChange }: TransactionListProps) {
+export default function TransactionList({ pagedData, loading, onPageChange, onDelete }: TransactionListProps) {
   const formatCurrency = (val: number, type: string) => {
     const formatted = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(Math.abs(val));
     if (type === "INCOME") return `+${formatted}`;
@@ -21,6 +25,16 @@ export default function TransactionList({ pagedData, loading, onPageChange }: Tr
     if (type === "INCOME") return { icon: ArrowUpRight, color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" };
     if (type === "EXPENSE") return { icon: ArrowDownRight, color: "text-rose-400 bg-rose-500/10 border-rose-500/20" };
     return { icon: ArrowLeftRight, color: "text-indigo-400 bg-indigo-500/10 border-indigo-500/20" };
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await transactionService.deleteTransaction(id);
+      useDashboardStore.getState().triggerRefresh();
+      onDelete?.(id);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const items = pagedData?.content || [];
@@ -55,7 +69,7 @@ export default function TransactionList({ pagedData, loading, onPageChange }: Tr
           const badge = getTypeBadge(tx.type);
           const Icon = badge.icon;
           return (
-            <div key={tx.id} className="p-4 flex items-center justify-between gap-3 hover:bg-zinc-950/40 transition-colors">
+            <div key={tx.id} className="p-4 flex items-center justify-between gap-3 hover:bg-zinc-950/40 transition-colors group">
               <div className="flex items-center gap-3 min-w-0">
                 <div className={`p-2.5 rounded-xl border ${badge.color} shrink-0`}>
                   <Icon className="h-4 w-4" />
@@ -72,11 +86,21 @@ export default function TransactionList({ pagedData, loading, onPageChange }: Tr
                 </div>
               </div>
 
-              <div className="text-right shrink-0">
-                <div className={`text-sm sm:text-base font-bold ${tx.type === "INCOME" ? "text-emerald-400" : tx.type === "TRANSFER" ? "text-indigo-300" : "text-white"}`}>
-                  {formatCurrency(tx.amount, tx.type)}
+              <div className="flex items-center gap-3 shrink-0">
+                <div className="text-right">
+                  <div className={`text-sm sm:text-base font-bold ${tx.type === "INCOME" ? "text-emerald-400" : tx.type === "TRANSFER" ? "text-indigo-300" : "text-white"}`}>
+                    {formatCurrency(tx.amount, tx.type)}
+                  </div>
+                  <div className="text-[10px] uppercase tracking-wider text-zinc-500">{tx.paymentMode || tx.type}</div>
                 </div>
-                <div className="text-[10px] uppercase tracking-wider text-zinc-500">{tx.paymentMode || tx.type}</div>
+                <button
+                  type="button"
+                  onClick={() => handleDelete(tx.id)}
+                  title="Delete transaction"
+                  className="p-1.5 rounded-lg text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 opacity-70 group-hover:opacity-100 transition-all"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
               </div>
             </div>
           );

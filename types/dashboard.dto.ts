@@ -1,4 +1,4 @@
-export interface SummaryDto{
+export interface SummaryDto {
   netWorth: number,
   totalIncome: number,
   totalExpense: number,
@@ -11,4 +11,13 @@ export interface CategoryBreakdownDto {
   totalAmount: number;
   percentage: number;
   transactionCount: number;
+}
+
+export interface MonthlyTrendDto {
+  month: string;
+  year: number;
+  monthValue: number;
+  totalIncome: number;
+  totalExpense: number;
+  netSavings: number;
 }

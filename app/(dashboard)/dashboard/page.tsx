@@ -6,6 +6,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import UserGreetings from "@/components/dashboard/UserGreetings";
 import QuickActionCommandBar from "@/components/dashboard/QuickActionCommandBar";
 import Summary from "@/components/dashboard/Summary";
+import MonthlyTrend from "@/components/dashboard/MonthlyTrend";
 import RecentTransactions from "@/components/dashboard/RecentTransactions";
 import CategorySpend from "@/components/dashboard/CategorySpend";
 import AiChatWidget from "@/components/dashboard/AiChatWidget";
@@ -39,6 +40,8 @@ export default function DashboardPage() {
       </header>
 
       <Summary />
+
+      <MonthlyTrend />
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         <div className="lg:col-span-3">

@@ -1,5 +1,4 @@
 import { apiClient } from "@/lib/apiClients";
-import { AccountDto } from "@/types/onboarding.dto";
 import { CategoryDto, PagedTransactionsDto, TransactionResponseDto } from "@/types/transaction.dto";
 
 export interface TransactionFilterParams {
@@ -35,7 +34,6 @@ export const transactionService = {
   },
 
 
-
   async getRecentTransactions() {
     return await apiClient<TransactionResponseDto[]>('/transactions/recent', {
       headers: {
@@ -50,4 +48,8 @@ export const transactionService = {
       body: JSON.stringify(payload),
     });
   },
+
+  async deleteTransaction(transactionId: string) {
+    return await apiClient<void>(`/transactions/${transactionId}`, { method: 'DELETE' });
+  }
 };

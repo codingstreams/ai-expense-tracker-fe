@@ -76,7 +76,7 @@ export default function TransactionsPage() {
       </div>
 
       <TransactionFilters filters={filters} onChange={handleFilterChange} onReset={handleReset} />
-      <TransactionList pagedData={pagedData} loading={loading} onPageChange={setPage} />
+      <TransactionList pagedData={pagedData} loading={loading} onPageChange={setPage} onDelete={() => fetchTransactions(page, filters)} />
       <TransactionModal isOpen={modalOpen} onClose={() => { setModalOpen(false); fetchTransactions(page, filters); }} />
     </div>
   );

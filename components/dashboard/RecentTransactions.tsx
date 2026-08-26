@@ -1,20 +1,32 @@
 "use client";
 
 import { transactionService } from "@/services/transaction.service";
-import { TransactionDto, TransactionResponseDto } from "@/types/transaction.dto";
-import { ArrowDownRight, ArrowUpRight, ShoppingBag, Utensils, Film, Briefcase, Car } from "lucide-react";
+import { TransactionResponseDto } from "@/types/transaction.dto";
+import { useDashboardStore } from "@/store/useDashboardStore";
+import { ArrowDownRight, ArrowUpRight, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function RecentTransactions() {
   const [transactions, setTransactions] = useState<TransactionResponseDto[]>([]);
+  const refreshTrigger = useDashboardStore((state) => state.refreshTrigger);
 
   useEffect(() => {
-    if (transactions.length == 0)
-      transactionService.getRecentTransactions()
-        .then(transactions => setTransactions(transactions))
-        .catch(() => { })
-  }, []);
+    transactionService
+      .getRecentTransactions()
+      .then((data) => setTransactions(data || []))
+      .catch(() => {});
+  }, [refreshTrigger]);
+
+  const handleDelete = async (id: string) => {
+    try {
+      await transactionService.deleteTransaction(id);
+      setTransactions((prev) => prev.filter((tx) => tx.id !== id));
+      useDashboardStore.getState().triggerRefresh();
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const formatCurrency = (val: number) => {
     const formatted = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(Math.abs(val));
@@ -39,7 +51,7 @@ export default function RecentTransactions() {
           return (
             <div
               key={tx.id}
-              className="flex items-center justify-between p-3 rounded-xl border border-zinc-800/70 bg-zinc-950/60 hover:bg-zinc-950 transition-colors"
+              className="flex items-center justify-between p-3 rounded-xl border border-zinc-800/70 bg-zinc-950/60 hover:bg-zinc-950 transition-colors group"
             >
               <div className="flex items-center gap-3 min-w-0">
                 <div className={`p-2.5 rounded-xl border shrink-0 ${isIncome ? 'bg-emerald-900/20 border-emerald-400' : 'bg-rose-900/20 border-rose-400'}`}>
@@ -51,11 +63,21 @@ export default function RecentTransactions() {
                 </div>
               </div>
 
-              <div className="text-right shrink-0">
-                <div className={`text-xs sm:text-sm font-bold flex items-center justify-end gap-1 ${isIncome ? "text-emerald-400" : "text-zinc-100"}`}>
-                  <span>{formatCurrency(tx.amount)}</span>
+              <div className="flex items-center gap-3 shrink-0">
+                <div className="text-right">
+                  <div className={`text-xs sm:text-sm font-bold flex items-center justify-end gap-1 ${isIncome ? "text-emerald-400" : "text-zinc-100"}`}>
+                    <span>{formatCurrency(tx.amount)}</span>
+                  </div>
+                  <div className="text-[10px] text-zinc-500 uppercase tracking-wider">{tx.category}</div>
                 </div>
-                <div className="text-[10px] text-zinc-500 uppercase tracking-wider">{tx.category}</div>
+                <button
+                  type="button"
+                  onClick={() => handleDelete(tx.id)}
+                  title="Delete transaction"
+                  className="p-1.5 rounded-lg text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 opacity-70 group-hover:opacity-100 transition-all"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
               </div>
             </div>
           );

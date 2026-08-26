@@ -22,7 +22,7 @@ export async function apiClient<T>(
       if (token) {
         headers.set('Authorization', `${tokenType} ${token}`);
       } else {
-        console.warn('No valid auth token found for secure endpoint. Endpoint: '+endpoint);
+        console.warn('No valid auth token found for secure endpoint. Endpoint: ' + endpoint);
       }
     } catch (e) {
       console.error('Failed to append authorization header', e);
@@ -39,9 +39,19 @@ export async function apiClient<T>(
     throw new Error(errorBody || `API Error: ${response.statusText}`);
   }
 
-  if (response.status === 204) {
+  if (response.status === 204 || response.status === 205) {
     return {} as T;
   }
 
-  return response.json();
+  const text = await response.text();
+  if (!text || !text.trim()) {
+    return {} as T;
+  }
+
+  try {
+    return JSON.parse(text) as T;
+  } catch (err) {
+    console.warn('Error parsing response as JSON:', err);
+    return text as unknown as T;
+  }
 }

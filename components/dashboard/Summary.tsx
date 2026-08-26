@@ -8,6 +8,7 @@ import { useDashboardStore } from "@/store/useDashboardStore";
 export default function Summary() {
   const summary = useDashboardStore((state) => state.summary);
   const setSummary = useDashboardStore((state) => state.setState);
+  const refreshTrigger = useDashboardStore((state) => state.refreshTrigger);
   const [loading, setLoading] = useState(!summary);
 
   useEffect(() => {
@@ -18,7 +19,7 @@ export default function Summary() {
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [setSummary]);
+  }, [setSummary, refreshTrigger]);
 
   const cards = [
     { label: "Net Worth", value: summary?.netWorth, icon: Wallet, color: "text-purple-400", cardBg: "bg-purple-950/20 border-purple-900/30", iconBg: "bg-purple-500/10 border-purple-500/20" },

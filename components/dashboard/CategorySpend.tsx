@@ -2,28 +2,21 @@
 
 import { dashboardService } from "@/services/dashboard.service";
 import { CategoryBreakdownDto } from "@/types/dashboard.dto";
+import { useDashboardStore } from "@/store/useDashboardStore";
 import { Utensils, ShoppingCart, Home, Film, Car } from "lucide-react";
 import { useEffect, useState } from "react";
 import { categoryMetadataMap } from "./category.icons";
 
 export default function CategorySpend() {
-  // const categories = [
-  //   { name: "Food & Dining", spent: 8400, percent: 35, icon: Utensils, barColor: "bg-rose-500", badgeColor: "text-rose-400 bg-rose-500/10 border-rose-500/20" },
-  //   { name: "Groceries", spent: 5600, percent: 24, icon: ShoppingCart, barColor: "bg-amber-500", badgeColor: "text-amber-400 bg-amber-500/10 border-amber-500/20" },
-  //   { name: "Housing & Utilities", spent: 4200, percent: 18, icon: Home, barColor: "bg-purple-500", badgeColor: "text-purple-400 bg-purple-500/10 border-purple-500/20" },
-  //   { name: "Transportation", spent: 3100, percent: 13, icon: Car, barColor: "bg-indigo-500", badgeColor: "text-indigo-400 bg-indigo-500/10 border-indigo-500/20" },
-  //   { name: "Entertainment", spent: 2400, percent: 10, icon: Film, barColor: "bg-emerald-500", badgeColor: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" },
-  // ];
-
   const [categories, setCategories] = useState<CategoryBreakdownDto[]>([]);
+  const refreshTrigger = useDashboardStore((state) => state.refreshTrigger);
 
   useEffect(() => {
-    if (categories.length == 0) {
-      dashboardService.getCategoryBreakdown()
-        .then(categories => setCategories(categories))
-        .catch(() => { })
-    }
-  }, []);
+    dashboardService
+      .getCategoryBreakdown()
+      .then((data) => setCategories(data || []))
+      .catch(() => {});
+  }, [refreshTrigger]);
 
   const totalSpent = categories.reduce((acc, c) => acc + c.totalAmount, 0);
 

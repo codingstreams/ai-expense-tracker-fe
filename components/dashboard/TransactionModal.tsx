@@ -11,6 +11,7 @@ import { transactionService } from "@/services/transaction.service";
 import { accountService } from "@/services/account.service";
 import { onboardingService } from "@/services/onboarding.service";
 import { transactionSchema, TransactionFormValues } from "@/lib/validations/transaction";
+import { useDashboardStore } from "@/store/useDashboardStore";
 
 interface TransactionModalProps {
   isOpen: boolean;
@@ -161,6 +162,7 @@ export default function TransactionModal({
         transactionDate: data.transactionDate || new Date().toISOString(),
       });
 
+      useDashboardStore.getState().triggerRefresh();
       reset();
       onSuccess?.();
       onClose();
