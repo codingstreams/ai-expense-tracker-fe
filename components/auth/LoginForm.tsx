@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import { Lock, Mail, Loader2, AlertCircle } from 'lucide-react';
 import { z } from 'zod';
 import { authService } from '@/services/auth.service';
+import { IS_PROD } from '@/config';
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
@@ -24,8 +25,8 @@ export default function LoginForm() {
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "akshay@codingstreams.in",
-      password: "test@1234"
+      email: IS_PROD ? "" : "akshay@codingstreams.in",
+      password: IS_PROD ? "" : "test@1234"
     }
   });
 

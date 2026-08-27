@@ -63,11 +63,12 @@ export default function TransactionModal({
   useEffect(() => {
     if (!isOpen) return;
 
+    setValue("transactionDate", new Date().toISOString().split("T")[0]);
     transactionService.getCategories().then(setCategories).catch(() => { });
     onboardingService.getSupportedPaymentModes().then(setPaymentModes).catch(() => { });
     accountService.getUserAccounts().then(setAccounts).catch(() => { });
     accountService.getCashAccount().then(setCashAcc).catch(() => { });
-  }, [isOpen]);
+  }, [isOpen, setValue]);
 
   useEffect(() => {
     if (!isOpen || !selectedPaymentModeId) return;
@@ -159,7 +160,7 @@ export default function TransactionModal({
         ...data,
         accountId,
         description: description || data.type,
-        transactionDate: data.transactionDate || new Date().toISOString(),
+        transactionDate: data.transactionDate || new Date().toISOString().split("T")[0],
       });
 
       useDashboardStore.getState().triggerRefresh();
@@ -203,16 +204,28 @@ export default function TransactionModal({
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-3.5">
-          <div>
-            <label className="block text-[11px] font-medium uppercase tracking-wider text-zinc-400 mb-1">Amount</label>
-            <input
-              type="number"
-              step="any"
-              placeholder="0.00"
-              {...register("amount", { valueAsNumber: true })}
-              className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3.5 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-            />
-            {errors.amount && <p className="text-xs text-rose-400 mt-1">{errors.amount.message}</p>}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-[11px] font-medium uppercase tracking-wider text-zinc-400 mb-1">Amount</label>
+              <input
+                type="number"
+                step="any"
+                placeholder="0.00"
+                {...register("amount", { valueAsNumber: true })}
+                className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3.5 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              />
+              {errors.amount && <p className="text-xs text-rose-400 mt-1">{errors.amount.message}</p>}
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-medium uppercase tracking-wider text-zinc-400 mb-1">Date</label>
+              <input
+                type="date"
+                {...register("transactionDate")}
+                className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3.5 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 [color-scheme:dark]"
+              />
+              {errors.transactionDate && <p className="text-xs text-rose-400 mt-1">{errors.transactionDate.message}</p>}
+            </div>
           </div>
 
           {currentType === "EXPENSE" && (
