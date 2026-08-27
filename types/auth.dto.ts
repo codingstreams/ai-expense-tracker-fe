@@ -24,3 +24,9 @@ export interface AuthResponseDto {
   expireAt: number;
   onboarded: boolean;
 }
+
+export interface ApiResponse {
+  status: string;
+  message: string;
+  timestamp: string;
+}

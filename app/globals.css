@@ -12,6 +12,17 @@
   --font-mono: var(--font-geist-mono);
 }
 
+html {
+  font-size: 17.5px;
+  -webkit-text-size-adjust: 100%;
+}
+
+@media (min-width: 1536px) {
+  html {
+    font-size: 18.5px;
+  }
+}
+
 body {
   background-color: #09090b;
   color: #f4f4f5;

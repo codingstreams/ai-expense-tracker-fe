@@ -1,5 +1,18 @@
 import { BASE_URL } from '@/config';
 import { useAuthStore } from '@/store/useAuthStore';
+import { ApiResponse } from '@/types/auth.dto';
+
+export class ApiError extends Error {
+  apiResponse?: ApiResponse;
+  status: number;
+
+  constructor(message: string, status: number, apiResponse?: ApiResponse) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.apiResponse = apiResponse;
+  }
+}
 
 export async function apiClient<T>(
   endpoint: string,
@@ -36,7 +49,15 @@ export async function apiClient<T>(
 
   if (!response.ok) {
     const errorBody = await response.text();
-    throw new Error(errorBody || `API Error: ${response.statusText}`);
+    let apiResponse: ApiResponse | undefined;
+    try {
+      if (errorBody) {
+        apiResponse = JSON.parse(errorBody) as ApiResponse;
+      }
+    } catch {}
+
+    const errorMessage = apiResponse?.message || errorBody || `API Error: ${response.statusText}`;
+    throw new ApiError(errorMessage, response.status, apiResponse);
   }
 
   if (response.status === 204 || response.status === 205) {

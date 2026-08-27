@@ -16,7 +16,7 @@ export function proxy(request: NextRequest) {
 
       if (authData) {
         token = authData.accessToken;
-        isOnboarded = authData.isOnbaorded;
+        isOnboarded = Boolean(authData.onboarded ?? authData.isOnboarded ?? authData.isOnbaorded);
         
         if (Date.now() >= authData.expireAt) {
           isExpired = true;
@@ -36,8 +36,16 @@ export function proxy(request: NextRequest) {
     return response;
   }
 
-  if (pathname.startsWith('/auth') && token && !isExpired ) {
-    return NextResponse.redirect(new URL(isOnboarded ?'/dashboard':'/onboarding', request.url));
+  if (pathname.startsWith('/auth') && token && !isExpired) {
+    return NextResponse.redirect(new URL(isOnboarded ? '/dashboard' : '/onboarding', request.url));
+  }
+
+  if (pathname.startsWith('/onboarding') && token && !isExpired && isOnboarded) {
+    return NextResponse.redirect(new URL('/dashboard', request.url));
+  }
+
+  if (pathname.startsWith('/dashboard') && token && !isExpired && !isOnboarded) {
+    return NextResponse.redirect(new URL('/onboarding', request.url));
   }
 
   return NextResponse.next();

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,11 +11,19 @@ import CashStep from "@/components/onboarding/CashStep";
 import PreferencesStep from "@/components/onboarding/PreferencesStep";
 import { onboardingService } from "@/services/onboarding.service";
 import { OnboardingFormValues, onboardingSchema } from "@/lib/validations/onboarding";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export default function OnboardingPage() {
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const router = useRouter();
+  const auth = useAuthStore((state) => state.auth);
+
+  useEffect(() => {
+    if (auth?.onboarded) {
+      router.replace("/dashboard");
+    }
+  }, [auth, router]);
 
   const methods = useForm<OnboardingFormValues>({
     resolver: zodResolver(onboardingSchema),
@@ -48,7 +56,18 @@ export default function OnboardingPage() {
         })),
         cashBalance: data.cashBalance,
       });
-      router.push("/dashboard");
+
+      const currentAuth = useAuthStore.getState().auth;
+      if (currentAuth) {
+        useAuthStore.setState({
+          auth: {
+            ...currentAuth,
+            onboarded: true,
+          },
+        });
+      }
+
+      router.replace("/dashboard");
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Failed to complete onboarding";
       setErrorMsg(msg);

@@ -6,6 +6,7 @@ import { useDashboardStore } from "@/store/useDashboardStore";
 import { ArrowDownRight, ArrowUpRight, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import NoTransactionsMsg from "../transactions/NoTransactionsMsg";
 
 export default function RecentTransactions() {
   const [transactions, setTransactions] = useState<TransactionResponseDto[]>([]);
@@ -15,7 +16,7 @@ export default function RecentTransactions() {
     transactionService
       .getRecentTransactions()
       .then((data) => setTransactions(data || []))
-      .catch(() => {});
+      .catch(() => { });
   }, [refreshTrigger]);
 
   const handleDelete = async (id: string) => {
@@ -32,6 +33,11 @@ export default function RecentTransactions() {
     const formatted = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(Math.abs(val));
     return val > 0 ? `+${formatted}` : `-${formatted}`;
   };
+
+  if (transactions.length === 0) {
+    return <NoTransactionsMsg />;
+  }
+
 
   return (
     <div className="p-5 rounded-2xl border border-zinc-800 bg-zinc-900 shadow-xl space-y-4">
