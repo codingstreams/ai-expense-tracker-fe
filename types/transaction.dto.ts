@@ -1,3 +1,5 @@
+import { BankDto } from "./onboarding.dto";
+
 export interface TransactionDto {
   id: string;
   type: string;
@@ -55,5 +57,7 @@ export interface CardDto {
   lastFourDigits?: string;
   cardType?: string;
   name?: string;
-  bank?: { id: string; name: string };
+  limit?: number;
+  accountId?: string;
+  bank?: BankDto;
 }

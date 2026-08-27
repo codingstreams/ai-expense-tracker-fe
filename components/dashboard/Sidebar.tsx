@@ -15,7 +15,7 @@ export default function Sidebar(){
   const pathname = usePathname();
   
   return (
-    <aside className="flex w-16 flex-col items-center justify-between border-r border-zinc-800 bg-zinc-900/50 py-8 backdrop-blur-md">
+    <aside className="sticky top-0 flex h-screen w-16 shrink-0 flex-col items-center justify-between border-r border-zinc-800 bg-zinc-900/50 py-8 backdrop-blur-md z-30 select-none">
         <div className="flex flex-col items-center gap-8">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600/20 border border-indigo-500/30 text-indigo-400">
             <Sparkles className="h-5 w-5" />
