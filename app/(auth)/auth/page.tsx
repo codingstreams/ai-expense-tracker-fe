@@ -5,6 +5,7 @@ import { Sparkles, ArrowRight, Zap } from 'lucide-react';
 import LoginForm from '@/components/auth/LoginForm';
 import RegisterForm from '@/components/auth/RegisterForm';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { Logo } from '@/components/auth/Logo';
 
 function AuthContent() {
   const router = useRouter();
@@ -21,9 +22,10 @@ function AuthContent() {
     <div className="flex min-h-screen w-full bg-zinc-950 text-zinc-100">
       <div className="hidden lg:flex lg:w-1/2 flex-col justify-between border-r border-zinc-800/80 bg-gradient-to-br from-purple-950/30 via-zinc-950 to-zinc-900 p-12 relative overflow-hidden">
         <div className="flex items-center gap-2.5 z-10">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-600/20 border border-purple-500/30 text-purple-400">
+          <Logo size={64} />
+          {/* <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-600/20 border border-purple-500/30 text-purple-400">
             <Sparkles className="h-5 w-5" />
-          </div>
+          </div> */}
           <span className="font-bold tracking-tight text-white text-lg">SpendAI</span>
         </div>
 
