@@ -3,7 +3,7 @@
 import { dashboardService } from "@/services/dashboard.service";
 import { CategoryBreakdownDto } from "@/types/dashboard.dto";
 import { useDashboardStore } from "@/store/useDashboardStore";
-import { Utensils, ShoppingCart, Home, Film, Car } from "lucide-react";
+import { Utensils, ShoppingCart, Home, Film, Car, TriangleAlert } from "lucide-react";
 import { useEffect, useState } from "react";
 import { categoryMetadataMap } from "./category.icons";
 
@@ -15,7 +15,7 @@ export default function CategorySpend() {
     dashboardService
       .getCategoryBreakdown()
       .then((data) => setCategories(data || []))
-      .catch(() => {});
+      .catch(() => { });
   }, [refreshTrigger]);
 
   const totalSpent = categories.reduce((acc, c) => acc + c.totalAmount, 0);
@@ -35,8 +35,8 @@ export default function CategorySpend() {
 
       <div className="space-y-3.5">
         {categories.map((cat) => {
-          const Icon = categoryMetadataMap[cat.categoryName].icon;
-          const iconColor = categoryMetadataMap[cat.categoryName].color;
+          const Icon = categoryMetadataMap[cat.categoryName].icon ?? TriangleAlert;
+          const iconColor = categoryMetadataMap[cat.categoryName].color ?? 'bg-amber-900/20 text-amber-600';
 
           return (
             <div key={cat.categoryName} className="space-y-1.5">
