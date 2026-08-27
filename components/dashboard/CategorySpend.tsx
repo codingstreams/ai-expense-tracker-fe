@@ -35,8 +35,10 @@ export default function CategorySpend() {
 
       <div className="space-y-3.5">
         {categories.map((cat) => {
-          const Icon = categoryMetadataMap[cat.categoryName].icon ?? TriangleAlert;
-          const iconColor = categoryMetadataMap[cat.categoryName].color ?? 'bg-amber-900/20 text-amber-600';
+          console.log('category: ' + cat.categoryName)
+
+          const Icon = cat.categoryName !== 'Uncategorized' ? categoryMetadataMap[cat.categoryName].icon : TriangleAlert;
+          const iconColor = cat.categoryName !== 'Uncategorized' ? categoryMetadataMap[cat.categoryName].color : 'bg-amber-900/20 text-amber-600';
 
           return (
             <div key={cat.categoryName} className="space-y-1.5">
