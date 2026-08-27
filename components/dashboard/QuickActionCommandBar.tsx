@@ -1,14 +1,27 @@
 "use client";
 
-import { useState } from "react";
-import { Sparkles, Plus, ChevronDown, ArrowDownRight, ArrowUpRight, ArrowLeftRight, CornerDownLeft } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Sparkles, Plus, ChevronDown, ArrowDownRight, ArrowUpRight, ArrowLeftRight, CornerDownLeft, Loader2 } from "lucide-react";
 import TransactionModal from "@/components/dashboard/TransactionModal";
+import { transactionService } from "@/services/transaction.service";
+import { notificationService } from "@/services/notification.service";
+import { useDashboardStore } from "@/store/useDashboardStore";
 
 export default function QuickActionCommandBar() {
   const [nlQuery, setNlQuery] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalType, setModalType] = useState<"EXPENSE" | "INCOME" | "TRANSFER">("EXPENSE");
+  const [processing, setProcessing] = useState(false);
+  const unsubscribeRef = useRef<(() => void) | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (unsubscribeRef.current) {
+        unsubscribeRef.current();
+      }
+    };
+  }, []);
 
   const openModal = (type: "EXPENSE" | "INCOME" | "TRANSFER") => {
     setModalType(type);
@@ -16,10 +29,45 @@ export default function QuickActionCommandBar() {
     setMenuOpen(false);
   };
 
-  const handleNlSubmit = (e: React.FormEvent) => {
+  const handleNlSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
-    if (!nlQuery.trim()) return;
-    setNlQuery("");
+    if (!nlQuery.trim() || processing) return;
+
+    try {
+      setProcessing(true);
+      const query = nlQuery.trim();
+
+      const task = await transactionService.addTransactionUsingAi({ rawText: query });
+
+      if (task?.id) {
+        if (unsubscribeRef.current) {
+          unsubscribeRef.current();
+        }
+
+        unsubscribeRef.current = notificationService.subscribeSSE(
+          task.id,
+          () => {
+            setProcessing(false);
+            setNlQuery("");
+            useDashboardStore.getState().triggerRefresh();
+            if (unsubscribeRef.current) {
+              unsubscribeRef.current();
+              unsubscribeRef.current = null;
+            }
+          },
+          () => {
+            setProcessing(false);
+            useDashboardStore.getState().triggerRefresh();
+          }
+        );
+      } else {
+        setProcessing(false);
+        setNlQuery("");
+        useDashboardStore.getState().triggerRefresh();
+      }
+    } catch {
+      setProcessing(false);
+    }
   };
 
   return (
@@ -28,20 +76,34 @@ export default function QuickActionCommandBar() {
         <div className="flex flex-col sm:flex-row items-center gap-2">
           <form onSubmit={handleNlSubmit} className="relative flex-1 w-full flex items-center">
             <div className="absolute left-3.5 flex items-center text-purple-400">
-              <Sparkles className="h-4 w-4 animate-pulse" />
+              {processing ? (
+                <Loader2 className="h-4 w-4 animate-spin text-purple-400" />
+              ) : (
+                <Sparkles className="h-4 w-4 animate-pulse" />
+              )}
             </div>
             <input
               type="text"
               value={nlQuery}
+              disabled={processing}
               onChange={(e) => setNlQuery(e.target.value)}
-              placeholder="e.g. &apos;I spent 200 rs on Blinkit&apos; or &apos;Salary credited 50k&apos;"
-              className="w-full rounded-xl border border-zinc-800/80 bg-zinc-950/80 pl-10 pr-24 py-2.5 text-xs sm:text-sm text-zinc-100 placeholder-zinc-500 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500 transition-all"
+              placeholder={
+                processing
+                  ? "AI is parsing and logging your transaction..."
+                  : "e.g. 'I spent 200 rs on Blinkit' or 'Salary credited 50k'"
+              }
+              className="w-full rounded-xl border border-zinc-800/80 bg-zinc-950/80 pl-10 pr-24 py-2.5 text-xs sm:text-sm text-zinc-100 placeholder-zinc-500 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500 transition-all disabled:opacity-70"
             />
             <button
               type="submit"
-              className="absolute right-2 px-2.5 py-2 text-xs font-semibold rounded-lg bg-purple-600/30 text-purple-300 border border-purple-500/30 hover:bg-purple-600/50 flex items-center gap-1 transition-colors"
+              disabled={processing || !nlQuery.trim()}
+              className="absolute right-2 px-2.5 py-2 text-xs font-semibold rounded-lg bg-purple-600/30 text-purple-300 border border-purple-500/30 hover:bg-purple-600/50 flex items-center gap-1 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              <CornerDownLeft className="h-3 w-3" />
+              {processing ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : (
+                <CornerDownLeft className="h-3 w-3" />
+              )}
             </button>
           </form>
 

@@ -1,5 +1,5 @@
 import { apiClient } from "@/lib/apiClients";
-import { CategoryDto, PagedTransactionsDto, TransactionResponseDto } from "@/types/transaction.dto";
+import { AiInputDto, AiParseTask, CategoryDto, PagedTransactionsDto, TransactionResponseDto } from "@/types/transaction.dto";
 
 export interface TransactionFilterParams {
   page?: number;
@@ -51,5 +51,9 @@ export const transactionService = {
 
   async deleteTransaction(transactionId: string) {
     return await apiClient<void>(`/transactions/${transactionId}`, { method: 'DELETE' });
+  },
+
+  async addTransactionUsingAi(input: AiInputDto) {
+    return await apiClient<AiParseTask>('/ai/parse-tasks', { method: 'POST', body: JSON.stringify(input) });
   }
 };

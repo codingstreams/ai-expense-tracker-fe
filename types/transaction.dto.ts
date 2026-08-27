@@ -61,3 +61,12 @@ export interface CardDto {
   accountId?: string;
   bank?: BankDto;
 }
+
+export interface AiInputDto {
+  rawText: string;
+}
+
+export interface AiParseTask {
+  id: string;
+  message: string;
+}
