@@ -3,6 +3,7 @@ export interface AuthResponseDto {
   tokenType: string;
   expiresInSeconds: number;
   onboarded: boolean;
+  expireAt: number;
 }
 
 export interface UserDetailsDto {
@@ -12,4 +13,15 @@ export interface UserDetailsDto {
   languagePreference: string;
   spendLimit: number | null;
   currency: string;
+}
+
+export interface ApiResponse {
+  status: string;
+  message: string;
+  timestamp: string;
+}
+
+export interface LoginRequestDto {
+  email: string;
+  password: string;
 }

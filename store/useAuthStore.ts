@@ -30,13 +30,13 @@ export const useAuthStore = create<AuthState>()(
 
         if (!authData) return null;
 
-        // const isExpired = Date.now() >= authData.expireAt;
+        const isExpired = Date.now() >= authData.expireAt;
 
-        // if (isExpired) {
-        //   console.warn("Token expired. Logging out user automatically.");
-        //   get().logout();
-        //   return null;
-        // }
+        if (isExpired) {
+          console.warn("Token expired. Logging out user automatically.");
+          get().logout();
+          return null;
+        }
 
         return authData.accessToken;
       },
