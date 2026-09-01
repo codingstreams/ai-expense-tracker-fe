@@ -30,4 +30,7 @@ export const authService = {
     return { auth, user };
   },
 
+  async logout() {
+    return await apiClient<void>('/auth/logout', { method: 'POST' });
+  }
 }
