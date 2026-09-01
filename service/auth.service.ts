@@ -1,4 +1,4 @@
-import { LoginRequestDto, AuthResponseDto, UserDetailsDto } from "@/types/auth.dto";
+import { LoginRequestDto, AuthResponseDto, UserDetailsDto, RegisterRequestDto } from "@/types/auth.dto";
 import { apiClient } from "./apiClient";
 import { userService } from "./user.service";
 
@@ -15,4 +15,19 @@ export const authService = {
 
     return { auth, user };
   },
+
+  async register(data: RegisterRequestDto): Promise<{ auth: AuthResponseDto, user: UserDetailsDto }> {
+    const auth = await apiClient<AuthResponseDto>('/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+
+    auth.expireAt = Date.now() + (auth.expiresInSeconds * 1000);
+
+    const user = await userService.getUserDetails(auth.accessToken);
+
+    return { auth, user };
+  },
+
 }

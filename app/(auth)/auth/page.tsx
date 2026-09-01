@@ -1,6 +1,7 @@
 'use client';
 
 import LoginForm from "@/components/auth/LoginForm";
+import RegisterForm from "@/components/auth/RegisterForm";
 import { Zap, Sparkles, ArrowRight } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
@@ -67,7 +68,7 @@ function AuthContent() {
             <span className="font-bold text-white text-lg">SpendAI</span>
           </div>
 
-          {isLogin ? <LoginForm /> : null}
+          {isLogin ? <LoginForm /> : <RegisterForm />}
 
           <div className="text-center text-xs text-zinc-400 pt-2">
             {isLogin ? (
