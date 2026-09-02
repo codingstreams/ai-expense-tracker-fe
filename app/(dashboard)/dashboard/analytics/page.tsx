@@ -1,5 +1,6 @@
 "use client";
 
+import AiInsights from "@/components/dashboard/analytics/AiInsights";
 import MonthlyTrend from "@/components/dashboard/MontlyTrend";
 import UserSummary from "@/components/dashboard/UserSummary";
 
@@ -16,7 +17,7 @@ export default function AnalyticsPage() {
 
       <MonthlyTrend variant="detailed" />
 
-
+      <AiInsights />
     </div>
   );
 }
