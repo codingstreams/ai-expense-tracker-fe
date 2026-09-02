@@ -1,4 +1,5 @@
 import CategoryBreakdown from "@/components/dashboard/CategoryBreakdown";
+import MonthlyTrend from "@/components/dashboard/MontlyTrend";
 import QuickInputBar from "@/components/dashboard/QuickInputBar";
 import RecentTransactions from "@/components/dashboard/RecentTransactions";
 import UserGreetings from "@/components/dashboard/UserGreetings";
@@ -15,6 +16,8 @@ export default function DashboardPage() {
       </header>
 
       <UserSummary />
+
+      <MonthlyTrend />
 
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">

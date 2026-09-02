@@ -1,4 +1,4 @@
-import { CategoryBreakdownDto, SummaryDto } from "@/types/dashboard.dto";
+import { CategoryBreakdownDto, MonthlyTrendDto, SummaryDto } from "@/types/dashboard.dto";
 import { apiClient } from "./apiClient";
 
 export const dashboardService = {
@@ -8,6 +8,10 @@ export const dashboardService = {
 
   async getDashboardSummary() {
     return await apiClient<SummaryDto>('/dashboard/summary');
+  },
+
+  async getMonthlyTrend() {
+    return await apiClient<MonthlyTrendDto[]>('/dashboard/monthly-trend');
   },
 
 }
