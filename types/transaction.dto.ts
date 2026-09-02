@@ -31,6 +31,16 @@ export interface TransactionResponseDto {
   category: string;
 }
 
+
+export interface AiInputDto {
+  rawText: string;
+}
+
+export interface AiParseTask {
+  id: string;
+  message: string;
+}
+
 export interface PagedTransactionsDto {
   content: TransactionResponseDto[];
   pageNumber: number;

@@ -1,5 +1,5 @@
 import { apiClient } from "./apiClient";
-import { CategoryDto, PagedTransactionsDto, PaymentModeDto, TransactionResponseDto } from "@/types/transaction.dto";
+import { AiInputDto, AiParseTask, CategoryDto, PagedTransactionsDto, PaymentModeDto, TransactionResponseDto } from "@/types/transaction.dto";
 
 export interface TransactionFilterParams {
   page?: number;
@@ -51,4 +51,8 @@ export const transactionService = {
     const endpoint = queryString ? `/transactions?${queryString}` : '/transactions';
     return await apiClient<PagedTransactionsDto>(endpoint);
   },
+
+  async addTransactionUsingAi(input: AiInputDto) {
+    return await apiClient<AiParseTask>('/ai/parse-tasks', { method: 'POST', body: JSON.stringify(input) });
+  }
 }
