@@ -1,4 +1,5 @@
 import CategoryBreakdown from "@/components/dashboard/CategoryBreakdown";
+import ChatWidget from "@/components/dashboard/chat/ChatWidget";
 import MonthlyTrend from "@/components/dashboard/MontlyTrend";
 import QuickInputBar from "@/components/dashboard/QuickInputBar";
 import RecentTransactions from "@/components/dashboard/RecentTransactions";
@@ -29,6 +30,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      <ChatWidget />
     </div>
   );
 }
