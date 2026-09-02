@@ -8,3 +8,10 @@ export interface TransactionResponseDto {
   paymentMode: string;
   category: string;
 }
+
+export interface CategoryBreakdownDto {
+  categoryName: string;
+  totalAmount: number;
+  percentage: number;
+  transactionCount: number;
+}

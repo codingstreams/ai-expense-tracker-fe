@@ -1,3 +1,4 @@
+import CategoryBreakdown from "@/components/dashboard/CategoryBreakdown";
 import RecentTransactions from "@/components/dashboard/RecentTransactions";
 import UserGreetings from "@/components/dashboard/UserGreetings";
 
@@ -12,6 +13,9 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         <div className="lg:col-span-3">
           <RecentTransactions />
+        </div>
+        <div className="lg:col-span-2">
+          <CategoryBreakdown />
         </div>
       </div>
 
