@@ -101,7 +101,6 @@ function AuthContent() {
   );
 }
 
-
 export default function AuthPage() {
   return (
     <Suspense fallback={<div className="min-h-screen w-full bg-zinc-950" />}>

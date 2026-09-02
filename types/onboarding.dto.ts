@@ -2,10 +2,22 @@ export interface LanguagePreferenceDto {
   options: string[]
 }
 
-export interface OnboardingDto {
-  userConfig: UserConfigDto;
-  cashBalance: number;
-  accounts: AccountDto[]
+export interface PaymentModeDto {
+  id: string;
+  name: string;
+}
+
+export interface BankDto {
+  id: string;
+  name: string;
+}
+
+export interface UserConfigDto {
+  languagePreference: string;
+  spendLimit: number;
+  currency: string;
+  paymentMode: string;
+  isOnboardingComplete: boolean;
 }
 
 export interface AccountDto {
@@ -18,15 +30,8 @@ export interface AccountDto {
   isNetBankingEnabled: boolean;
 }
 
-export interface UserConfigDto {
-  languagePreference: string;
-  spendLimit: number;
-  currency: string;
-  paymentMode: string;
-  isOnboardingComplete: boolean;
-}
-
-export interface BankDto {
-  id: string;
-  name: string;
+export interface OnboardingDto {
+  userConfig: UserConfigDto;
+  accounts: AccountDto[];
+  cashBalance: number;
 }
