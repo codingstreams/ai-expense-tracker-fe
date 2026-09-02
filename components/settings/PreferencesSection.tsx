@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { Check, AlertCircle, Save } from "lucide-react";
-import { onboardingService } from "@/services/onboarding.service";
-import { userService } from "@/services/user.service";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useDashboardStore } from "@/store/useDashboardStore";
 import { PaymentModeDto } from "@/types/onboarding.dto";
+import { onboardingService } from "@/service/onboarding.service";
+import { userService } from "@/service/user.service";
 
 export default function PreferencesSection() {
   const [languages, setLanguages] = useState<string[]>(["EN", "HI", "ES", "FR"]);

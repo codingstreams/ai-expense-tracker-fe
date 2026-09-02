@@ -2,11 +2,11 @@
 
 import { transactionService } from "@/service/transaction.service";
 import { useDashboardStore } from "@/store/useDashboardStore";
-import { TransactionResponseDto } from "@/types/dashboard.dto";
 import { ArrowDownRight, ArrowUpRight, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import EmptyTransactionList from "./transactions/EmptyTransactionList";
+import { TransactionResponseDto } from "@/types/transaction.dto";
 
 
 export default function RecentTransactions() {

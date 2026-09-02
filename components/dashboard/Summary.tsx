@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { Wallet, TrendingUp, TrendingDown, PiggyBank, Flame } from "lucide-react";
-import { dashboardService } from "@/services/dashboard.service";
+
 import { useDashboardStore } from "@/store/useDashboardStore";
+import { dashboardService } from "@/service/dashboard.service";
+import { SummaryDto } from "@/types/dashboard.dto";
 
 export default function Summary() {
-  const summary = useDashboardStore((state) => state.summary);
-  const setSummary = useDashboardStore((state) => state.setState);
+  const [summary, setSummary] = useState<SummaryDto | null>(null);
+
   const refreshTrigger = useDashboardStore((state) => state.refreshTrigger);
   const [loading, setLoading] = useState(!summary);
 
@@ -17,7 +19,7 @@ export default function Summary() {
       .then((data) => {
         if (data) setSummary(data);
       })
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setLoading(false));
   }, [setSummary, refreshTrigger]);
 

@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { Building2, Plus, Trash2, X, AlertCircle, Check } from "lucide-react";
-import { accountService } from "@/services/account.service";
 import { AccountDto, BankDto } from "@/types/onboarding.dto";
-import { apiClient } from "@/lib/apiClients";
 import { useDashboardStore } from "@/store/useDashboardStore";
+import { accountService } from "@/service/account.service";
+import { apiClient } from "@/service/apiClient";
 
 export default function AccountsSection() {
   const [accounts, setAccounts] = useState<AccountDto[]>([]);

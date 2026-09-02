@@ -2,10 +2,10 @@
 
 import { ArrowDownRight, ArrowUpRight, ArrowLeftRight, ChevronLeft, ChevronRight, Inbox, Trash2 } from "lucide-react";
 import { PagedTransactionsDto } from "@/types/transaction.dto";
-import { transactionService } from "@/services/transaction.service";
 
 import { useDashboardStore } from "@/store/useDashboardStore";
 import NoTransactionsMsg from "./NoTransactionsMsg";
+import { transactionService } from "@/service/transaction.service";
 
 interface TransactionListProps {
   pagedData: PagedTransactionsDto | null;

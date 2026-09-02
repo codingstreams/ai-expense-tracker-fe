@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { Sparkles, AlertTriangle, Lightbulb, TrendingUp, RefreshCw } from "lucide-react";
-import { analyticsService } from "@/services/analytics.service";
 import { AiInsightDto } from "@/types/analytics.dto";
+import { analyticsService } from "@/service/analytics.service";
 
 export default function AiInsights() {
   const [insight, setInsight] = useState<AiInsightDto | null>(null);
@@ -16,7 +16,7 @@ export default function AiInsights() {
       .then((data) => {
         if (data) setInsight(data);
       })
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setLoading(false));
   };
 
@@ -27,7 +27,7 @@ export default function AiInsights() {
       .then((data) => {
         if (data) setInsight(data);
       })
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setLoading(false));
   };
 

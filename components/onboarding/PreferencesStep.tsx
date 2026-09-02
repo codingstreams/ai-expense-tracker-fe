@@ -1,9 +1,10 @@
 "use client";
 
+import { onboardingService } from "@/service/onboarding.service";
+import { OnboardingFormValues } from "@/validations/onboarding";
 import { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
-import { onboardingService } from "@/services/onboarding.service";
-import { OnboardingFormValues } from "@/lib/validations/onboarding";
+
 
 export default function PreferencesStep() {
   const { register, formState: { errors } } = useFormContext<OnboardingFormValues>();

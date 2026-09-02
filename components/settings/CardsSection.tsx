@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { CreditCard, Plus, Trash2, X, AlertCircle } from "lucide-react";
-import { accountService } from "@/services/account.service";
 import { CardDto } from "@/types/transaction.dto";
 import { BankDto, AccountDto } from "@/types/onboarding.dto";
-import { apiClient } from "@/lib/apiClients";
+import { accountService } from "@/service/account.service";
+import { apiClient } from "@/service/apiClient";
+
 
 export default function CardsSection() {
   const [debitCards, setDebitCards] = useState<CardDto[]>([]);
@@ -193,8 +194,8 @@ export default function CardsSection() {
                 <div className="flex items-center gap-3 min-w-0">
                   <div
                     className={`p-2.5 rounded-xl border shrink-0 ${isCredit
-                        ? "bg-purple-500/10 border-purple-500/20 text-purple-400"
-                        : "bg-indigo-500/10 border-indigo-500/20 text-indigo-400"
+                      ? "bg-purple-500/10 border-purple-500/20 text-purple-400"
+                      : "bg-indigo-500/10 border-indigo-500/20 text-indigo-400"
                       }`}
                   >
                     <CreditCard className="h-4 w-4" />
@@ -208,8 +209,8 @@ export default function CardsSection() {
                       <span>•</span>
                       <span
                         className={`text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded border ${isCredit
-                            ? "bg-purple-500/10 border-purple-500/20 text-purple-400"
-                            : "bg-indigo-500/10 border-indigo-500/20 text-indigo-400"
+                          ? "bg-purple-500/10 border-purple-500/20 text-purple-400"
+                          : "bg-indigo-500/10 border-indigo-500/20 text-indigo-400"
                           }`}
                       >
                         {isCredit ? "Credit" : "Debit"}
@@ -276,8 +277,8 @@ export default function CardsSection() {
                       })
                     }
                     className={`py-2 text-xs font-semibold rounded-xl border transition-all ${cardForm.cardType === "DEBIT"
-                        ? "border-indigo-500 bg-indigo-500/10 text-indigo-400"
-                        : "border-zinc-800 bg-zinc-950 text-zinc-400 hover:text-zinc-200"
+                      ? "border-indigo-500 bg-indigo-500/10 text-indigo-400"
+                      : "border-zinc-800 bg-zinc-950 text-zinc-400 hover:text-zinc-200"
                       } disabled:opacity-40 disabled:cursor-not-allowed`}
                     title={accounts.length === 0 ? "No bank accounts available. Add a bank account first" : ""}
                   >
@@ -293,8 +294,8 @@ export default function CardsSection() {
                       })
                     }
                     className={`py-2 text-xs font-semibold rounded-xl border transition-all ${cardForm.cardType === "CREDIT"
-                        ? "border-purple-500 bg-purple-500/10 text-purple-400"
-                        : "border-zinc-800 bg-zinc-950 text-zinc-400 hover:text-zinc-200"
+                      ? "border-purple-500 bg-purple-500/10 text-purple-400"
+                      : "border-zinc-800 bg-zinc-950 text-zinc-400 hover:text-zinc-200"
                       }`}
                   >
                     Credit Card

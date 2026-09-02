@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { Check, AlertCircle, Save } from "lucide-react";
-import { accountService } from "@/services/account.service";
 import { useDashboardStore } from "@/store/useDashboardStore";
+import { accountService } from "@/service/account.service";
 
 export default function CashSection() {
   const [balance, setBalance] = useState<number>(0);
