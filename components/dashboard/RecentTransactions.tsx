@@ -6,6 +6,7 @@ import { TransactionResponseDto } from "@/types/dashboard.dto";
 import { ArrowDownRight, ArrowUpRight, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import EmptyTransactionList from "./transactions/EmptyTransactionList";
 
 
 export default function RecentTransactions() {
@@ -35,7 +36,7 @@ export default function RecentTransactions() {
   };
 
   if (transactions.length === 0) {
-    return <div>No Transactions</div>;
+    return <EmptyTransactionList />;
   }
 
 

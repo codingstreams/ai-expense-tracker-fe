@@ -19,3 +19,23 @@ export interface PaymentModeDto {
   id: string;
   name: string;
 }
+
+export interface TransactionResponseDto {
+  id: string;
+  type: string;
+  amount: number;
+  transactionDate: string;
+  description: string;
+  account: string;
+  paymentMode: string;
+  category: string;
+}
+
+export interface PagedTransactionsDto {
+  content: TransactionResponseDto[];
+  pageNumber: number;
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
+  isLast: boolean;
+}
