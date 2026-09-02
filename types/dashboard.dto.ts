@@ -15,3 +15,11 @@ export interface CategoryBreakdownDto {
   percentage: number;
   transactionCount: number;
 }
+
+export interface SummaryDto {
+  netWorth: number,
+  totalIncome: number,
+  totalExpense: number,
+  netSavings: number,
+  dailyBurnRate: number
+}

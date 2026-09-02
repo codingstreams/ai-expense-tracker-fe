@@ -2,6 +2,7 @@ import CategoryBreakdown from "@/components/dashboard/CategoryBreakdown";
 import QuickInputBar from "@/components/dashboard/QuickInputBar";
 import RecentTransactions from "@/components/dashboard/RecentTransactions";
 import UserGreetings from "@/components/dashboard/UserGreetings";
+import UserSummary from "@/components/dashboard/UserSummary";
 
 export default function DashboardPage() {
   return (
@@ -12,6 +13,8 @@ export default function DashboardPage() {
           <QuickInputBar />
         </div>
       </header>
+
+      <UserSummary />
 
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
