@@ -1,4 +1,5 @@
 import CategoryBreakdown from "@/components/dashboard/CategoryBreakdown";
+import QuickInputBar from "@/components/dashboard/QuickInputBar";
 import RecentTransactions from "@/components/dashboard/RecentTransactions";
 import UserGreetings from "@/components/dashboard/UserGreetings";
 
@@ -7,6 +8,9 @@ export default function DashboardPage() {
     <div className="p-6 md:p-8 space-y-6 max-w-7xl mx-auto">
       <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <UserGreetings />
+        <div className="w-full lg:w-auto lg:min-w-[540px]">
+          <QuickInputBar />
+        </div>
       </header>
 
 
