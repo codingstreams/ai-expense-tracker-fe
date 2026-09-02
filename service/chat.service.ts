@@ -1,5 +1,5 @@
-import { apiClient } from "@/lib/apiClients";
 import { ChatMessageDto, ChatReplyDto } from "@/types/chat.dto";
+import { apiClient } from "./apiClient";
 
 export const chatService = {
   async chat(message: ChatMessageDto) {

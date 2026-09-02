@@ -4,8 +4,9 @@ import { ArrowDownRight, ArrowUpRight, ArrowLeftRight, ChevronLeft, ChevronRight
 import { PagedTransactionsDto } from "@/types/transaction.dto";
 
 import { useDashboardStore } from "@/store/useDashboardStore";
-import NoTransactionsMsg from "./NoTransactionsMsg";
+import EmptyTransactionList from "./EmptyTransactionList";
 import { transactionService } from "@/service/transaction.service";
+
 
 interface TransactionListProps {
   pagedData: PagedTransactionsDto | null;
@@ -54,7 +55,7 @@ export default function TransactionList({ pagedData, loading, onPageChange, onDe
   }
 
   if (items.length === 0) {
-    return <NoTransactionsMsg />;
+    return <EmptyTransactionList />;
   }
 
   return (

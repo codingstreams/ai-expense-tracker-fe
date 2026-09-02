@@ -2,14 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { Wallet, TrendingUp, TrendingDown, PiggyBank, Flame } from "lucide-react";
-
 import { useDashboardStore } from "@/store/useDashboardStore";
 import { dashboardService } from "@/service/dashboard.service";
 import { SummaryDto } from "@/types/dashboard.dto";
 
-export default function Summary() {
+export default function UserSummary() {
   const [summary, setSummary] = useState<SummaryDto | null>(null);
-
   const refreshTrigger = useDashboardStore((state) => state.refreshTrigger);
   const [loading, setLoading] = useState(!summary);
 

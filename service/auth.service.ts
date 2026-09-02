@@ -1,14 +1,9 @@
-import {
-  LoginRequestDto,
-  RegisterRequestDto,
-  AuthResponseDto,
-  UserDto
-} from '@/types/auth.dto';
-import { userService } from './user.service';
-import { apiClient } from '@/lib/apiClients';
+import { LoginRequestDto, AuthResponseDto, UserDetailsDto, RegisterRequestDto } from "@/types/auth.dto";
+import { apiClient } from "./apiClient";
+import { userService } from "./user.service";
 
 export const authService = {
-  async login(credentials: LoginRequestDto): Promise<{ auth: AuthResponseDto, user: UserDto }> {
+  async login(credentials: LoginRequestDto): Promise<{ auth: AuthResponseDto, user: UserDetailsDto }> {
     const auth = await apiClient<AuthResponseDto>('/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -21,7 +16,7 @@ export const authService = {
     return { auth, user };
   },
 
-  async register(data: RegisterRequestDto): Promise<{ auth: AuthResponseDto, user: UserDto }> {
+  async register(data: RegisterRequestDto): Promise<{ auth: AuthResponseDto, user: UserDetailsDto }> {
     const auth = await apiClient<AuthResponseDto>('/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -34,4 +29,8 @@ export const authService = {
 
     return { auth, user };
   },
-};
+
+  async logout() {
+    return await apiClient<void>('/auth/logout', { method: 'POST' });
+  }
+}

@@ -1,6 +1,6 @@
-import { AuthResponseDto, UserDto } from '@/types/auth.dto';
-import { create } from 'zustand';
-import { persist, StateStorage, createJSONStorage } from 'zustand/middleware';
+import { AuthResponseDto, UserDetailsDto } from "@/types/auth.dto";
+import { create } from "zustand";
+import { StateStorage, persist, createJSONStorage } from "zustand/middleware";
 import Cookies from 'js-cookie';
 
 const cookieStorage: StateStorage = {
@@ -9,11 +9,12 @@ const cookieStorage: StateStorage = {
   removeItem: (name) => Cookies.remove(name),
 };
 
+
 interface AuthState {
   auth: AuthResponseDto | null;
-  user: UserDto | null;
-  setAuth: (auth: AuthResponseDto, user: UserDto) => void;
-  getToken: ()=>string|null;
+  user: UserDetailsDto | null;
+  setAuth: (auth: AuthResponseDto, user: UserDetailsDto) => void;
+  getToken: () => string | null;
   logout: () => void;
 }
 
@@ -23,17 +24,17 @@ export const useAuthStore = create<AuthState>()(
     (set, get) => ({
       auth: null,
       user: null,
-      setAuth: (auth, user) => set({ auth, user }),
-      getToken: () =>{
+      setAuth: (auth: AuthResponseDto, user: UserDetailsDto) => set({ auth, user }),
+      getToken: () => {
         const authData = get().auth;
-        
+
         if (!authData) return null;
 
         const isExpired = Date.now() >= authData.expireAt;
 
         if (isExpired) {
           console.warn("Token expired. Logging out user automatically.");
-          get().logout(); 
+          get().logout();
           return null;
         }
 

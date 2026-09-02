@@ -24,7 +24,7 @@ export async function apiClient<T>(
     headers.set('Content-Type', 'application/json');
   }
 
-  const isAuthRoute = endpoint.includes('/auth/');
+  const isAuthRoute = endpoint.includes('/auth/') && endpoint !== '/auth/logout';
   if (!isAuthRoute) {
     try {
       const store = useAuthStore.getState();
@@ -54,7 +54,7 @@ export async function apiClient<T>(
       if (errorBody) {
         apiResponse = JSON.parse(errorBody) as ApiResponse;
       }
-    } catch {}
+    } catch { }
 
     const errorMessage = apiResponse?.message || errorBody || `API Error: ${response.statusText}`;
     throw new ApiError(errorMessage, response.status, apiResponse);

@@ -2,18 +2,18 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Sparkles, Plus, ChevronDown, ArrowDownRight, ArrowUpRight, ArrowLeftRight, CornerDownLeft, Loader2 } from "lucide-react";
-import TransactionModal from "@/components/dashboard/TransactionModal";
-import { transactionService } from "@/services/transaction.service";
-import { notificationService } from "@/services/notification.service";
 import { useDashboardStore } from "@/store/useDashboardStore";
+import { transactionService } from "@/service/transaction.service";
+import TransactionModal from "./TransactionModal";
+import { notificationService } from "@/service/notification.service";
 
-export default function QuickActionCommandBar() {
-  const [nlQuery, setNlQuery] = useState("");
+export default function QuickInputBar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalType, setModalType] = useState<"EXPENSE" | "INCOME" | "TRANSFER">("EXPENSE");
   const [processing, setProcessing] = useState(false);
   const unsubscribeRef = useRef<(() => void) | null>(null);
+  const [query, setQuery] = useState<string>("");
 
   useEffect(() => {
     return () => {
@@ -29,15 +29,14 @@ export default function QuickActionCommandBar() {
     setMenuOpen(false);
   };
 
-  const handleNlSubmit = async (e: React.SubmitEvent) => {
+
+  const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
-    if (!nlQuery.trim() || processing) return;
+    if (!query.trim() || processing) return;
 
     try {
       setProcessing(true);
-      const query = nlQuery.trim();
-
-      const task = await transactionService.addTransactionUsingAi({ rawText: query });
+      const task = await transactionService.addTransactionUsingAi({ rawText: query.trim() });
 
       if (task?.id) {
         if (unsubscribeRef.current) {
@@ -48,7 +47,7 @@ export default function QuickActionCommandBar() {
           task.id,
           () => {
             setProcessing(false);
-            setNlQuery("");
+            setQuery("");
             useDashboardStore.getState().triggerRefresh();
             if (unsubscribeRef.current) {
               unsubscribeRef.current();
@@ -62,7 +61,7 @@ export default function QuickActionCommandBar() {
         );
       } else {
         setProcessing(false);
-        setNlQuery("");
+        setQuery("");
         useDashboardStore.getState().triggerRefresh();
       }
     } catch {
@@ -73,8 +72,10 @@ export default function QuickActionCommandBar() {
   return (
     <>
       <div className="relative rounded-2xl border border-purple-500/30 bg-gradient-to-r from-purple-950/40 via-zinc-900 to-zinc-900 p-2 shadow-xl shadow-purple-950/20 backdrop-blur-md">
+
         <div className="flex flex-col sm:flex-row items-center gap-2">
-          <form onSubmit={handleNlSubmit} className="relative flex-1 w-full flex items-center">
+
+          <form onSubmit={handleSubmit} className="relative flex-1 w-full flex items-center">
             <div className="absolute left-3.5 flex items-center text-purple-400">
               {processing ? (
                 <Loader2 className="h-4 w-4 animate-spin text-purple-400" />
@@ -84,9 +85,9 @@ export default function QuickActionCommandBar() {
             </div>
             <input
               type="text"
-              value={nlQuery}
+              value={query}
               disabled={processing}
-              onChange={(e) => setNlQuery(e.target.value)}
+              onChange={(e) => setQuery(e.target.value)}
               placeholder={
                 processing
                   ? "AI is parsing and logging your transaction..."
@@ -96,7 +97,7 @@ export default function QuickActionCommandBar() {
             />
             <button
               type="submit"
-              disabled={processing || !nlQuery.trim()}
+              disabled={processing || !query.trim()}
               className="absolute right-2 px-2.5 py-2 text-xs font-semibold rounded-lg bg-purple-600/30 text-purple-300 border border-purple-500/30 hover:bg-purple-600/50 flex items-center gap-1 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {processing ? (

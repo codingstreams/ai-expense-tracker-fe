@@ -5,7 +5,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, Receipt, PieChart, Settings, Menu, X } from "lucide-react";
 import LogoutButton from "../auth/LogoutButton";
-import { Logo } from "../auth/Logo";
 
 const navItems = [
   { name: "Overview", href: "/dashboard", icon: LayoutDashboard },
@@ -27,7 +26,7 @@ export default function Sidebar() {
       {/* Mobile Top Header Bar */}
       <header className="flex md:hidden items-center justify-between px-4 py-3 border-b border-zinc-800 bg-zinc-950/90 backdrop-blur-md sticky top-0 z-40 shrink-0">
         <div className="flex items-center gap-2.5">
-          <Logo size={28} />
+          {/* <Logo size={28} /> */}
           <span className="font-bold text-sm tracking-tight text-white">SpendAI</span>
         </div>
         <button
@@ -51,7 +50,7 @@ export default function Sidebar() {
             <div className="space-y-6">
               <div className="flex items-center justify-between border-b border-zinc-800/80 pb-4">
                 <div className="flex items-center gap-2.5">
-                  <Logo size={32} />
+                  {/* <Logo size={32} /> */}
                   <span className="font-bold text-base tracking-tight text-white">SpendAI</span>
                 </div>
                 <button
@@ -74,11 +73,10 @@ export default function Sidebar() {
                       key={item.name}
                       href={item.href}
                       onClick={() => setIsOpen(false)}
-                      className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all ${
-                        isActive
-                          ? "bg-purple-600 text-white shadow-lg shadow-purple-600/30 font-semibold"
-                          : "text-zinc-400 hover:bg-zinc-800/70 hover:text-zinc-200"
-                      }`}
+                      className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all ${isActive
+                        ? "bg-purple-600 text-white shadow-lg shadow-purple-600/30 font-semibold"
+                        : "text-zinc-400 hover:bg-zinc-800/70 hover:text-zinc-200"
+                        }`}
                     >
                       <Icon className="h-5 w-5" />
                       <span>{item.name}</span>
@@ -98,7 +96,7 @@ export default function Sidebar() {
       {/* Desktop Sticky Sidebar */}
       <aside className="hidden md:flex sticky top-0 h-screen w-16 shrink-0 flex-col items-center justify-between border-r border-zinc-800 bg-zinc-900/50 py-8 backdrop-blur-md z-30 select-none">
         <div className="flex flex-col items-center gap-8">
-          <Logo size={44} />
+          {/* <Logo size={44} /> */}
 
           <nav className="flex flex-col gap-3">
             {navItems.map((item) => {
@@ -110,11 +108,10 @@ export default function Sidebar() {
                   key={item.name}
                   href={item.href}
                   title={item.name}
-                  className={`flex h-11 w-11 items-center justify-center rounded-xl transition ${
-                    isActive
-                      ? "bg-purple-600 text-white shadow-lg shadow-purple-600/30"
-                      : "text-zinc-400 hover:bg-zinc-800/80 hover:text-zinc-200"
-                  }`}
+                  className={`flex h-11 w-11 items-center justify-center rounded-xl transition ${isActive
+                    ? "bg-purple-600 text-white shadow-lg shadow-purple-600/30"
+                    : "text-zinc-400 hover:bg-zinc-800/80 hover:text-zinc-200"
+                    }`}
                 >
                   <Icon className="h-5 w-5" />
                 </Link>

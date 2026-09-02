@@ -3,14 +3,13 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { registerSchema } from '@/lib/validations/auth';
+
 import { useAuthStore } from '@/store/useAuthStore';
 import { useRouter } from 'next/navigation';
 import { Lock, Mail, User, Loader2, AlertCircle } from 'lucide-react';
-import { z } from 'zod';
-import { authService } from '@/services/auth.service';
+import { RegisterFormValues, registerSchema } from '@/validations/auth';
+import { authService } from '@/service/auth.service';
 
-type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function RegisterForm() {
   const router = useRouter();
