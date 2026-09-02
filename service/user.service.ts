@@ -10,4 +10,15 @@ export const userService = {
     });
   },
 
+  async getUserPreferences(): Promise<UserDetailsDto> {
+    return await apiClient<UserDetailsDto>(`/users/me`);
+  },
+
+  async updatePreferences(payload: Partial<UserDetailsDto>): Promise<UserDetailsDto> {
+    return await apiClient<UserDetailsDto>('/users/me/config', {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  },
+
 }

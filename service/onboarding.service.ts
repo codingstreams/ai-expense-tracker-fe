@@ -1,5 +1,6 @@
 import { LanguagePreferenceDto, OnboardingDto } from "@/types/onboarding.dto";
 import { apiClient } from "./apiClient";
+import { PaymentModeDto } from "@/types/transaction.dto";
 
 export const onboardingService = {
   async getSupportedLanguagePreferences() {
@@ -11,5 +12,9 @@ export const onboardingService = {
       method: 'POST',
       body: JSON.stringify(requestBody),
     });
+  },
+
+  async getSupportedPaymentModes() {
+    return await apiClient<PaymentModeDto[]>('/payment-modes');
   },
 }

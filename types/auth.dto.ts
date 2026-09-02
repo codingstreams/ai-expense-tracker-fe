@@ -13,6 +13,7 @@ export interface UserDetailsDto {
   languagePreference: string;
   spendLimit: number | null;
   currency: string;
+  paymentMode: string;
 }
 
 export interface ApiResponse {
