@@ -2,11 +2,11 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { Plus } from "lucide-react";
-import { transactionService, TransactionFilterParams } from "@/services/transaction.service";
-import { PagedTransactionsDto } from "@/types/transaction.dto";
-import TransactionFilters, { FilterState } from "@/components/transactions/TransactionFilters";
-import TransactionList from "@/components/transactions/TransactionList";
 import TransactionModal from "@/components/dashboard/TransactionModal";
+import TransactionFilters, { FilterState } from "@/components/dashboard/transactions/TransactionFilters";
+import TransactionList from "@/components/dashboard/transactions/TransactionList";
+import { TransactionFilterParams, transactionService } from "@/service/transaction.service";
+import { PagedTransactionsDto } from "@/types/transaction.dto";
 
 export default function TransactionsPage() {
   const [modalOpen, setModalOpen] = useState(false);

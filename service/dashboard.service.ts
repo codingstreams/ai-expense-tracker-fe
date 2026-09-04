@@ -1,7 +1,11 @@
-import { apiClient } from "@/lib/apiClients";
 import { CategoryBreakdownDto, MonthlyTrendDto, SummaryDto } from "@/types/dashboard.dto";
+import { apiClient } from "./apiClient";
 
 export const dashboardService = {
+  async getCategoryBreakdown() {
+    return await apiClient<CategoryBreakdownDto[]>('/dashboard/category-breakdown');
+  },
+
   async getDashboardSummary() {
     return await apiClient<SummaryDto>('/dashboard/summary');
   },
@@ -10,7 +14,4 @@ export const dashboardService = {
     return await apiClient<MonthlyTrendDto[]>('/dashboard/monthly-trend');
   },
 
-  async getCategoryBreakdown() {
-    return await apiClient<CategoryBreakdownDto[]>('/dashboard/category-breakdown');
-  }
-};
+}

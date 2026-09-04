@@ -5,13 +5,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { X, ArrowDownRight, ArrowUpRight, ArrowLeftRight } from "lucide-react";
-import { CategoryDto, CardDto } from "@/types/transaction.dto";
-import { AccountDto, PaymentModeDto } from "@/types/onboarding.dto";
-import { transactionService } from "@/services/transaction.service";
-import { accountService } from "@/services/account.service";
-import { onboardingService } from "@/services/onboarding.service";
-import { transactionSchema, TransactionFormValues } from "@/lib/validations/transaction";
 import { useDashboardStore } from "@/store/useDashboardStore";
+import { transactionService } from "@/service/transaction.service";
+import { AccountDto } from "@/types/onboarding.dto";
+import { TransactionFormValues, transactionSchema } from "@/validations/transaction";
+import { CategoryDto, CardDto, PaymentModeDto } from "@/types/transaction.dto";
+import { accountService } from "@/service/account.service";
 
 interface TransactionModalProps {
   isOpen: boolean;
@@ -26,6 +25,7 @@ export default function TransactionModal({
   initialType = "EXPENSE",
   onSuccess,
 }: TransactionModalProps) {
+  const [transactionType, setTransactionType] = useState<"EXPENSE" | "INCOME" | "TRANSFER">(initialType)
   const [cashAcc, setCashAcc] = useState<AccountDto | null>(null);
   const [categories, setCategories] = useState<CategoryDto[]>([]);
   const [paymentModes, setPaymentModes] = useState<PaymentModeDto[]>([]);
@@ -65,10 +65,10 @@ export default function TransactionModal({
 
     setValue("transactionDate", new Date().toISOString().split("T")[0]);
     transactionService.getCategories().then(setCategories).catch(() => { });
-    onboardingService.getSupportedPaymentModes().then(setPaymentModes).catch(() => { });
+    transactionService.getSupportedPaymentModes().then(setPaymentModes).catch(() => { });
     accountService.getUserAccounts().then(setAccounts).catch(() => { });
     accountService.getCashAccount().then(setCashAcc).catch(() => { });
-  }, [isOpen, setValue]);
+  }, [isOpen, setValue, transactionType]);
 
   useEffect(() => {
     if (!isOpen || !selectedPaymentModeId) return;
@@ -98,7 +98,7 @@ export default function TransactionModal({
     } else if (modeName.includes("credit")) {
       accountService.getCreditCards().then(setCreditCards).catch(() => { });
     }
-  }, [selectedPaymentModeId, paymentModes, isOpen, cashAcc, currentType, setValue]);
+  }, [selectedPaymentModeId, paymentModes, isOpen, cashAcc, currentType, setValue, transactionType]);
 
   useEffect(() => {
     if (currentType === "TRANSFER" && sourceAccountId && destAccountId && sourceAccountId !== destAccountId) {
@@ -108,7 +108,7 @@ export default function TransactionModal({
       const toLabel = toAcc ? `${toAcc.bank?.name || "Account"} (••${toAcc.lastFourDigits})` : "Destination";
       setValue("description", `Transfer from ${fromLabel} to ${toLabel}`);
     }
-  }, [currentType, sourceAccountId, destAccountId, accounts, setValue]);
+  }, [currentType, sourceAccountId, destAccountId, accounts, setValue, transactionType]);
 
   if (!isOpen) return null;
 
@@ -130,6 +130,7 @@ export default function TransactionModal({
   ];
 
   const handleTabChange = (newType: "EXPENSE" | "INCOME" | "TRANSFER") => {
+    setTransactionType(newType);
     setValue("type", newType);
     setValue("accountId", "");
     setValue("toAccountId", "");

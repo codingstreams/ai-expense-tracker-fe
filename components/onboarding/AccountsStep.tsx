@@ -1,10 +1,10 @@
 "use client";
 
+import { apiClient } from "@/service/apiClient";
+import { BankDto } from "@/types/onboarding.dto";
+import { OnboardingFormValues } from "@/validations/onboarding";
 import { useEffect, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
-import { apiClient } from "@/lib/apiClients";
-import { OnboardingFormValues } from "@/lib/validations/onboarding";
-import { BankDto } from "@/types/onboarding.dto";
 
 export default function AccountsStep() {
   const { control, register, setValue, watch, formState: { errors } } = useFormContext<OnboardingFormValues>();

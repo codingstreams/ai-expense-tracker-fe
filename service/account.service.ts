@@ -1,37 +1,11 @@
-import { apiClient } from "@/lib/apiClients";
 import { AccountDto, BankDto } from "@/types/onboarding.dto";
+import { apiClient } from "./apiClient";
 import { CardDto } from "@/types/transaction.dto";
 
 export const accountService = {
-  async getCashAccount() {
-    return await apiClient<AccountDto>('/accounts/cash');
-  },
-
-  async addAccount(account: AccountDto) {
-    return await apiClient<AccountDto>('/accounts', {
-      method: 'POST',
-      body: JSON.stringify({ accounts: [account] }),
-    });
-  },
-
-  async updateAccount(id: string, account: Partial<AccountDto>) {
-    return await apiClient<AccountDto>(`/accounts/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(account),
-    });
-  },
-
-  async updateCashBalance(cashBalance: number) {
-    return await apiClient<AccountDto>('/accounts/cash', { method: 'PUT', body: JSON.stringify({ cashBalance: cashBalance }) });
-  },
-
-  async deleteAccount(id: string) {
-    return await apiClient<void>(`/accounts/${id}`, {
-      method: 'DELETE',
-    });
-  },
-
   async getUserAccounts(paymentMode?: string) {
+    console.log("getting user accounts")
+
     const query = paymentMode ? `?paymentMode=${encodeURIComponent(paymentMode)}` : '';
     return await apiClient<AccountDto[]>(`/accounts${query}`, {
       headers: {
@@ -40,12 +14,30 @@ export const accountService = {
     });
   },
 
+  async getCashAccount() {
+    return await apiClient<AccountDto>('/accounts/cash');
+  },
+
   async getDebitCards() {
     return await apiClient<CardDto[]>('/cards?type=DEBIT_CARD');
   },
 
   async getCreditCards() {
     return await apiClient<CardDto[]>('/cards?type=CREDIT_CARD');
+  },
+
+
+  async addAccount(account: AccountDto) {
+    return await apiClient<AccountDto>('/accounts', {
+      method: 'POST',
+      body: JSON.stringify({ accounts: [account] }),
+    });
+  },
+
+  async deleteAccount(id: string) {
+    return await apiClient<void>(`/accounts/${id}`, {
+      method: 'DELETE',
+    });
   },
 
   async addCard(payload: {
@@ -66,4 +58,9 @@ export const accountService = {
       method: 'DELETE',
     });
   },
-};
+
+
+  async updateCashBalance(cashBalance: number) {
+    return await apiClient<AccountDto>('/accounts/cash', { method: 'PUT', body: JSON.stringify({ cashBalance: cashBalance }) });
+  },
+}

@@ -1,17 +1,14 @@
 'use client';
 
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { IS_PROD } from "@/config";
+import { authService } from "@/service/auth.service";
+import { useAuthStore } from "@/store/useAuthStore";
+import { LoginFormValues, loginSchema } from "@/validations/auth";
 import { zodResolver } from '@hookform/resolvers/zod';
-import { loginSchema } from '@/lib/validations/auth';
-import { useAuthStore } from '@/store/useAuthStore';
-import { useRouter } from 'next/navigation';
-import { Lock, Mail, Loader2, AlertCircle } from 'lucide-react';
-import { z } from 'zod';
-import { authService } from '@/services/auth.service';
-import { IS_PROD } from '@/config';
-
-type LoginFormValues = z.infer<typeof loginSchema>;
+import { AlertCircle, Mail, Loader2, Lock } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 
 export default function LoginForm() {
   const router = useRouter();
