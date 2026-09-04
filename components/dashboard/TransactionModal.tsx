@@ -27,8 +27,7 @@ export default function TransactionModal({
   onSuccess,
 }: TransactionModalProps) {
   const [cashAcc, setCashAcc] = useState<AccountDto | null>(null);
-  const [categories, setCategories] = useState<CategoryDto[]>([]);
-  const [paymentModes, setPaymentModes] = useState<PaymentModeDto[]>([]);
+  const { paymentModes, categories, setPaymentModes, setCategories } = useDashboardStore();
   const [accounts, setAccounts] = useState<AccountDto[]>([]);
   const [debitCards, setDebitCards] = useState<CardDto[]>([]);
   const [creditCards, setCreditCards] = useState<CardDto[]>([]);
@@ -64,8 +63,19 @@ export default function TransactionModal({
     if (!isOpen) return;
 
     setValue("transactionDate", new Date().toISOString().split("T")[0]);
-    transactionService.getCategories().then(setCategories).catch(() => { });
-    onboardingService.getSupportedPaymentModes().then(setPaymentModes).catch(() => { });
+
+    if (categories.length == 0) {
+      console.log("Initializing Categories...")
+      transactionService.getCategories().then(setCategories).catch(() => { });
+      console.log("Initialized Categories")
+    }
+
+    if (paymentModes.length == 0) {
+      console.log("Initializing Payment Modes...")
+      onboardingService.getSupportedPaymentModes().then(setPaymentModes).catch(() => { });
+      console.log("Initialized Payment Modes")
+    }
+
     accountService.getUserAccounts().then(setAccounts).catch(() => { });
     accountService.getCashAccount().then(setCashAcc).catch(() => { });
   }, [isOpen, setValue]);

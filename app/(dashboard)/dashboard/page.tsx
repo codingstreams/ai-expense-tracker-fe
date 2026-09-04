@@ -10,20 +10,34 @@ import MonthlyTrend from "@/components/dashboard/MonthlyTrend";
 import RecentTransactions from "@/components/dashboard/RecentTransactions";
 import CategorySpend from "@/components/dashboard/CategorySpend";
 import AiChatWidget from "@/components/dashboard/AiChatWidget";
+import { useDashboardStore } from "@/store/useDashboardStore";
+import { dashboardService } from "@/services/dashboard.service";
 
 export default function DashboardPage() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const isOnboarded = useAuthStore((state) => state.auth?.onboarded);
+  const { triggerRefresh, setDashboardOverview } = useDashboardStore();
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   useEffect(() => {
-    if (mounted && !isOnboarded) {
+    console.log("Loading Dashboard...")
+
+    if (!mounted) return;
+
+    if (!isOnboarded) {
       router.replace("/onboarding");
+      return;
     }
+
+    dashboardService
+      .getDashboardOverview()
+      .then(setDashboardOverview)
+      .then(() => triggerRefresh())
+      .catch(() => { });
   }, [mounted, isOnboarded, router]);
 
   if (!mounted || !isOnboarded) {

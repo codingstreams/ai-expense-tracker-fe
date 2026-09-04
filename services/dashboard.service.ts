@@ -1,9 +1,9 @@
 import { apiClient } from "@/lib/apiClients";
-import { CategoryBreakdownDto, MonthlyTrendDto, SummaryDto } from "@/types/dashboard.dto";
+import { CategoryBreakdownDto, DashboardOverviewResponseDto, MonthlyTrendDto, UserSummaryDto } from "@/types/dashboard.dto";
 
 export const dashboardService = {
   async getDashboardSummary() {
-    return await apiClient<SummaryDto>('/dashboard/summary');
+    return await apiClient<UserSummaryDto>('/dashboard/summary');
   },
 
   async getMonthlyTrend() {
@@ -12,5 +12,8 @@ export const dashboardService = {
 
   async getCategoryBreakdown() {
     return await apiClient<CategoryBreakdownDto[]>('/dashboard/category-breakdown');
+  },
+  async getDashboardOverview() {
+    return await apiClient<DashboardOverviewResponseDto>('/dashboard/overview', { headers: { 'X-API-Version': '2' } })
   }
 };

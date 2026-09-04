@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
+import { IS_PROD } from "./config";
 
 const nextConfig: NextConfig = {
-  allowedDevOrigins: ['192.168.1.10'],
+  compiler: {
+    removeConsole: IS_PROD,
+  },
   /* config options here */
   async redirects() {
     return [

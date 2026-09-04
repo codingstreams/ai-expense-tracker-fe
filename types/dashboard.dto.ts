@@ -1,4 +1,6 @@
-export interface SummaryDto {
+import { TransactionResponseDto } from "./transaction.dto";
+
+export interface UserSummaryDto {
   netWorth: number,
   totalIncome: number,
   totalExpense: number,
@@ -20,4 +22,11 @@ export interface MonthlyTrendDto {
   totalIncome: number;
   totalExpense: number;
   netSavings: number;
+}
+
+export interface DashboardOverviewResponseDto {
+  userSummary: UserSummaryDto;
+  monthlyTrend: MonthlyTrendDto[];
+  recentTransactions: TransactionResponseDto[];
+  categoryBreakdown: CategoryBreakdownDto[];
 }
