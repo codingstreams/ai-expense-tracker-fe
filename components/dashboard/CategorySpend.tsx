@@ -8,15 +8,10 @@ import { useEffect, useState } from "react";
 import { categoryMetadataMap } from "./category.icons";
 
 export default function CategorySpend() {
-  const [categories, setCategories] = useState<CategoryBreakdownDto[]>([]);
-  const refreshTrigger = useDashboardStore((state) => state.refreshTrigger);
+  const overview = useDashboardStore((s) => s.overview);
+  // const loading = !overview;
 
-  useEffect(() => {
-    dashboardService
-      .getCategoryBreakdown()
-      .then((data) => setCategories(data || []))
-      .catch(() => { });
-  }, [refreshTrigger]);
+  const categories = overview?.categoryBreakdown || []
 
   const totalSpent = categories.reduce((acc, c) => acc + c.totalAmount, 0);
 

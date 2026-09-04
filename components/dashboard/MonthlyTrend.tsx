@@ -10,19 +10,10 @@ interface MonthlyTrendProps {
 }
 
 export default function MonthlyTrend({ variant = "compact" }: MonthlyTrendProps) {
-  const [trends, setTrends] = useState<MonthlyTrendDto[]>([]);
-  const [loading, setLoading] = useState(true);
-  const refreshTrigger = useDashboardStore((state) => state.refreshTrigger);
+  const overview = useDashboardStore((s) => s.overview);
+  const loading = !overview;
 
-  useEffect(() => {
-    dashboardService
-      .getMonthlyTrend()
-      .then((data) => {
-        if (data) setTrends(data);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, [refreshTrigger]);
+  const trends = overview?.monthlyTrend || []
 
   const formatCurrency = (val: number) => {
     return new Intl.NumberFormat("en-IN", {
@@ -55,9 +46,8 @@ export default function MonthlyTrend({ variant = "compact" }: MonthlyTrendProps)
 
   return (
     <div
-      className={`${
-        isDetailed ? "p-5 rounded-2xl space-y-5" : "p-4 rounded-xl space-y-3"
-      } border border-zinc-800 bg-zinc-900 shadow-xl`}
+      className={`${isDetailed ? "p-5 rounded-2xl space-y-5" : "p-4 rounded-xl space-y-3"
+        } border border-zinc-800 bg-zinc-900 shadow-xl`}
     >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800/80 pb-3">
         <div className="flex items-center gap-2">
@@ -99,9 +89,8 @@ export default function MonthlyTrend({ variant = "compact" }: MonthlyTrendProps)
             return (
               <div
                 key={idx}
-                className={`flex flex-col justify-between ${
-                  isDetailed ? "p-3 rounded-xl" : "p-2 rounded-lg"
-                } border border-zinc-800/70 bg-zinc-950/50 hover:bg-zinc-950 transition-colors`}
+                className={`flex flex-col justify-between ${isDetailed ? "p-3 rounded-xl" : "p-2 rounded-lg"
+                  } border border-zinc-800/70 bg-zinc-950/50 hover:bg-zinc-950 transition-colors`}
               >
                 <div className="flex items-center justify-between text-[11px] font-semibold text-zinc-300 mb-1">
                   <span className="uppercase">{formatMonth(item.month)}</span>
@@ -112,9 +101,8 @@ export default function MonthlyTrend({ variant = "compact" }: MonthlyTrendProps)
                   <div className="flex flex-col items-center h-full justify-end group relative">
                     <div
                       style={{ height: `${incomeHeight}%` }}
-                      className={`${
-                        isDetailed ? "w-3 sm:w-3.5 rounded-t-sm" : "w-2.5 rounded-t-[2px]"
-                      } bg-emerald-500/80 hover:bg-emerald-500 transition-all cursor-pointer`}
+                      className={`${isDetailed ? "w-3 sm:w-3.5 rounded-t-sm" : "w-2.5 rounded-t-[2px]"
+                        } bg-emerald-500/80 hover:bg-emerald-500 transition-all cursor-pointer`}
                     />
                     <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute -top-7 bg-zinc-950 border border-zinc-700 px-1.5 py-0.5 rounded text-[10px] text-emerald-400 font-medium whitespace-nowrap z-10 shadow-lg pointer-events-none">
                       {formatFullCurrency(item.totalIncome)}
@@ -124,9 +112,8 @@ export default function MonthlyTrend({ variant = "compact" }: MonthlyTrendProps)
                   <div className="flex flex-col items-center h-full justify-end group relative">
                     <div
                       style={{ height: `${expenseHeight}%` }}
-                      className={`${
-                        isDetailed ? "w-3 sm:w-3.5 rounded-t-sm" : "w-2.5 rounded-t-[2px]"
-                      } bg-rose-500/80 hover:bg-rose-500 transition-all cursor-pointer`}
+                      className={`${isDetailed ? "w-3 sm:w-3.5 rounded-t-sm" : "w-2.5 rounded-t-[2px]"
+                        } bg-rose-500/80 hover:bg-rose-500 transition-all cursor-pointer`}
                     />
                     <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute -top-7 bg-zinc-950 border border-zinc-700 px-1.5 py-0.5 rounded text-[10px] text-rose-400 font-medium whitespace-nowrap z-10 shadow-lg pointer-events-none">
                       {formatFullCurrency(item.totalExpense)}

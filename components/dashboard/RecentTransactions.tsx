@@ -1,29 +1,27 @@
 "use client";
 
 import { transactionService } from "@/services/transaction.service";
-import { TransactionResponseDto } from "@/types/transaction.dto";
 import { useDashboardStore } from "@/store/useDashboardStore";
 import { ArrowDownRight, ArrowUpRight, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import NoTransactionsMsg from "../transactions/NoTransactionsMsg";
 
 export default function RecentTransactions() {
-  const [transactions, setTransactions] = useState<TransactionResponseDto[]>([]);
-  const refreshTrigger = useDashboardStore((state) => state.refreshTrigger);
+  const overview = useDashboardStore((s) => s.overview);
+  const loading = !overview;
 
-  useEffect(() => {
-    transactionService
-      .getRecentTransactions()
-      .then((data) => setTransactions(data || []))
-      .catch(() => { });
-  }, [refreshTrigger]);
+  const transactions = overview?.recentTransactions || []
 
   const handleDelete = async (id: string) => {
     try {
-      await transactionService.deleteTransaction(id);
-      setTransactions((prev) => prev.filter((tx) => tx.id !== id));
-      useDashboardStore.getState().triggerRefresh();
+      await transactionService.deleteTransaction(id)
+        .then(() => {
+          // setTransactions((prev) => prev.filter((tx) => tx.id !== id));
+          // const t = transactions.filter((tx) => tx.id !== id)
+          // setDashboardOverview((t) => { });
+          useDashboardStore.getState().triggerRefresh();
+        });
+
     } catch (err) {
       console.error(err);
     }
@@ -34,7 +32,7 @@ export default function RecentTransactions() {
     return val > 0 ? `+${formatted}` : `-${formatted}`;
   };
 
-  if (transactions.length === 0) {
+  if (loading || transactions.length === 0) {
     return <NoTransactionsMsg />;
   }
 
