@@ -1,10 +1,11 @@
 "use client";
 
+import { useAppStore } from "@/store/useAppStore";
 import { Wallet, TrendingUp, TrendingDown, PiggyBank, Flame } from "lucide-react";
-import { useDashboardStore } from "@/store/useDashboardStore";
+
 
 export default function Summary() {
-  const overview = useDashboardStore((state) => state.overview);
+  const overview = useAppStore((state) => state.overview);
   const loading = !overview;
 
   const cards = [

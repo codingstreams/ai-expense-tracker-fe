@@ -1,14 +1,11 @@
 "use client";
 
-import { dashboardService } from "@/services/dashboard.service";
-import { CategoryBreakdownDto } from "@/types/dashboard.dto";
-import { useDashboardStore } from "@/store/useDashboardStore";
-import { Utensils, ShoppingCart, Home, Film, Car, TriangleAlert } from "lucide-react";
-import { useEffect, useState } from "react";
+import { TriangleAlert } from "lucide-react";
 import { categoryMetadataMap } from "./category.icons";
+import { useAppStore } from "@/store/useAppStore";
 
 export default function CategorySpend() {
-  const overview = useDashboardStore((s) => s.overview);
+  const overview = useAppStore((s) => s.overview);
   // const loading = !overview;
 
   const categories = overview?.categoryBreakdown || []
@@ -30,8 +27,6 @@ export default function CategorySpend() {
 
       <div className="space-y-3.5">
         {categories.map((cat) => {
-          console.log('category: ' + cat.categoryName)
-
           const Icon = cat.categoryName !== 'Uncategorized' ? categoryMetadataMap[cat.categoryName].icon : TriangleAlert;
           const iconColor = cat.categoryName !== 'Uncategorized' ? categoryMetadataMap[cat.categoryName].color : 'bg-amber-900/20 text-amber-600';
 

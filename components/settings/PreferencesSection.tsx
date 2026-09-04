@@ -5,8 +5,8 @@ import { Check, AlertCircle, Save } from "lucide-react";
 import { onboardingService } from "@/services/onboarding.service";
 import { userService } from "@/services/user.service";
 import { useAuthStore } from "@/store/useAuthStore";
-import { useDashboardStore } from "@/store/useDashboardStore";
 import { PaymentModeDto } from "@/types/onboarding.dto";
+import { useAppStore } from "@/store/useAppStore";
 
 export default function PreferencesSection() {
   const [languages, setLanguages] = useState<string[]>(["EN", "HI", "ES", "FR"]);
@@ -96,7 +96,7 @@ export default function PreferencesSection() {
         });
       }
 
-      useDashboardStore.getState().triggerRefresh();
+      useAppStore.getState().triggerRefresh();
       setSuccessMsg("Preferences saved successfully!");
       setTimeout(() => setSuccessMsg(""), 3500);
     } catch (err: unknown) {

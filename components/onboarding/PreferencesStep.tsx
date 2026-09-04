@@ -46,9 +46,6 @@ export default function PreferencesStep() {
             className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3.5 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
             disabled >
             <option value="INR">INR (₹)</option>
-            {/* <option value="USD">USD ($)</option>
-            <option value="EUR">EUR (€)</option>
-            <option value="GBP">GBP (£)</option> */}
           </select>
           {errors.currency && <p className="text-xs text-red-400 mt-1">{errors.currency.message}</p>}
         </div>

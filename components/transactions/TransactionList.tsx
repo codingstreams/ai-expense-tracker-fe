@@ -4,8 +4,8 @@ import { ArrowDownRight, ArrowUpRight, ArrowLeftRight, ChevronLeft, ChevronRight
 import { PagedTransactionsDto } from "@/types/transaction.dto";
 import { transactionService } from "@/services/transaction.service";
 
-import { useDashboardStore } from "@/store/useDashboardStore";
 import NoTransactionsMsg from "./NoTransactionsMsg";
+import { useAppStore } from "@/store/useAppStore";
 
 interface TransactionListProps {
   pagedData: PagedTransactionsDto | null;
@@ -31,7 +31,7 @@ export default function TransactionList({ pagedData, loading, onPageChange, onDe
   const handleDelete = async (id: string) => {
     try {
       await transactionService.deleteTransaction(id);
-      useDashboardStore.getState().triggerRefresh();
+      useAppStore.getState().triggerRefresh();
       onDelete?.(id);
     } catch (err) {
       console.error(err);

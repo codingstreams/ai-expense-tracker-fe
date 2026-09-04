@@ -5,7 +5,7 @@ import { Building2, Plus, Trash2, X, AlertCircle, Check } from "lucide-react";
 import { accountService } from "@/services/account.service";
 import { AccountDto, BankDto } from "@/types/onboarding.dto";
 import { apiClient } from "@/lib/apiClients";
-import { useDashboardStore } from "@/store/useDashboardStore";
+import { useAppStore } from "@/store/useAppStore";
 
 export default function AccountsSection() {
   const [accounts, setAccounts] = useState<AccountDto[]>([]);
@@ -51,7 +51,7 @@ export default function AccountsSection() {
     try {
       await accountService.deleteAccount(id);
       setAccounts((prev) => prev.filter((a) => a.id !== id));
-      useDashboardStore.getState().triggerRefresh();
+      useAppStore.getState().triggerRefresh();
       setSuccessMsg("Account removed successfully!");
       setTimeout(() => setSuccessMsg(""), 3500);
     } catch (err) {
@@ -95,7 +95,7 @@ export default function AccountsSection() {
       });
       setModalOpen(false);
       await loadAccounts();
-      useDashboardStore.getState().triggerRefresh();
+      useAppStore.getState().triggerRefresh();
       setSuccessMsg("Bank account added successfully!");
       setTimeout(() => setSuccessMsg(""), 3500);
     } catch (err: unknown) {

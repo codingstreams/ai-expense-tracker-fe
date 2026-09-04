@@ -11,7 +11,8 @@ import { transactionService } from "@/services/transaction.service";
 import { accountService } from "@/services/account.service";
 import { onboardingService } from "@/services/onboarding.service";
 import { transactionSchema, TransactionFormValues } from "@/lib/validations/transaction";
-import { useDashboardStore } from "@/store/useDashboardStore";
+import { useAppStore } from "@/store/useAppStore";
+
 
 interface TransactionModalProps {
   isOpen: boolean;
@@ -27,7 +28,7 @@ export default function TransactionModal({
   onSuccess,
 }: TransactionModalProps) {
   const [cashAcc, setCashAcc] = useState<AccountDto | null>(null);
-  const { paymentModes, categories, setPaymentModes, setCategories } = useDashboardStore();
+  const { paymentModes, categories, setPaymentModes, setCategories } = useAppStore();
   const [accounts, setAccounts] = useState<AccountDto[]>([]);
   const [debitCards, setDebitCards] = useState<CardDto[]>([]);
   const [creditCards, setCreditCards] = useState<CardDto[]>([]);
@@ -173,7 +174,7 @@ export default function TransactionModal({
         transactionDate: data.transactionDate || new Date().toISOString().split("T")[0],
       });
 
-      useDashboardStore.getState().triggerRefresh();
+      useAppStore.getState().triggerRefresh();
       reset();
       onSuccess?.();
       onClose();

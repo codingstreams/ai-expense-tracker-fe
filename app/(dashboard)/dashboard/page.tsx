@@ -10,14 +10,14 @@ import MonthlyTrend from "@/components/dashboard/MonthlyTrend";
 import RecentTransactions from "@/components/dashboard/RecentTransactions";
 import CategorySpend from "@/components/dashboard/CategorySpend";
 import AiChatWidget from "@/components/dashboard/AiChatWidget";
-import { useDashboardStore } from "@/store/useDashboardStore";
 import { dashboardService } from "@/services/dashboard.service";
+import { useAppStore } from "@/store/useAppStore";
 
 export default function DashboardPage() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const isOnboarded = useAuthStore((state) => state.auth?.onboarded);
-  const { triggerRefresh, setDashboardOverview } = useDashboardStore();
+  const { triggerRefresh, setDashboardOverview } = useAppStore();
 
   useEffect(() => {
     setMounted(true);

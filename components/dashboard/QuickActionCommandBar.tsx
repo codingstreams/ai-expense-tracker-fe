@@ -5,7 +5,7 @@ import { Sparkles, Plus, ChevronDown, ArrowDownRight, ArrowUpRight, ArrowLeftRig
 import TransactionModal from "@/components/dashboard/TransactionModal";
 import { transactionService } from "@/services/transaction.service";
 import { notificationService } from "@/services/notification.service";
-import { useDashboardStore } from "@/store/useDashboardStore";
+import { useAppStore } from "@/store/useAppStore";
 
 export default function QuickActionCommandBar() {
   const [nlQuery, setNlQuery] = useState("");
@@ -49,7 +49,7 @@ export default function QuickActionCommandBar() {
           () => {
             setProcessing(false);
             setNlQuery("");
-            useDashboardStore.getState().triggerRefresh();
+            useAppStore.getState().triggerRefresh();
             if (unsubscribeRef.current) {
               unsubscribeRef.current();
               unsubscribeRef.current = null;
@@ -57,13 +57,13 @@ export default function QuickActionCommandBar() {
           },
           () => {
             setProcessing(false);
-            useDashboardStore.getState().triggerRefresh();
+            useAppStore.getState().triggerRefresh();
           }
         );
       } else {
         setProcessing(false);
         setNlQuery("");
-        useDashboardStore.getState().triggerRefresh();
+        useAppStore.getState().triggerRefresh();
       }
     } catch {
       setProcessing(false);

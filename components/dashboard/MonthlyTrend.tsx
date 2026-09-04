@@ -1,16 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { dashboardService } from "@/services/dashboard.service";
-import { MonthlyTrendDto } from "@/types/dashboard.dto";
-import { useDashboardStore } from "@/store/useDashboardStore";
+import { useAppStore } from "@/store/useAppStore";
 
 interface MonthlyTrendProps {
   variant?: "compact" | "detailed";
 }
 
 export default function MonthlyTrend({ variant = "compact" }: MonthlyTrendProps) {
-  const overview = useDashboardStore((s) => s.overview);
+  const overview = useAppStore((s) => s.overview);
   const loading = !overview;
 
   const trends = overview?.monthlyTrend || []

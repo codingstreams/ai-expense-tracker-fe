@@ -1,13 +1,14 @@
 "use client";
 
 import { transactionService } from "@/services/transaction.service";
-import { useDashboardStore } from "@/store/useDashboardStore";
+
 import { ArrowDownRight, ArrowUpRight, Trash2 } from "lucide-react";
 import Link from "next/link";
 import NoTransactionsMsg from "../transactions/NoTransactionsMsg";
+import { useAppStore } from "@/store/useAppStore";
 
 export default function RecentTransactions() {
-  const overview = useDashboardStore((s) => s.overview);
+  const overview = useAppStore((s) => s.overview);
   const loading = !overview;
 
   const transactions = overview?.recentTransactions || []
@@ -19,7 +20,7 @@ export default function RecentTransactions() {
           // setTransactions((prev) => prev.filter((tx) => tx.id !== id));
           // const t = transactions.filter((tx) => tx.id !== id)
           // setDashboardOverview((t) => { });
-          useDashboardStore.getState().triggerRefresh();
+          useAppStore.getState().triggerRefresh();
         });
 
     } catch (err) {

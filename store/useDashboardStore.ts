@@ -1,7 +1,10 @@
 import { DashboardOverviewResponseDto, UserSummaryDto } from "@/types/dashboard.dto";
 import { PaymentModeDto } from "@/types/onboarding.dto";
 import { CategoryDto } from "@/types/transaction.dto";
-import { create } from "zustand";
+import { create, StateCreator } from "zustand";
+import { TransactionsStoreState } from "./useTransactions";
+import { set } from "react-hook-form";
+
 
 export interface DashboardState {
   paymentModes: PaymentModeDto[];
@@ -15,14 +18,28 @@ export interface DashboardState {
   triggerRefresh: () => void;
 }
 
-export const useDashboardStore = create<DashboardState>((set) => ({
-  paymentModes: [],
-  categories: [],
-  refreshTrigger: 0,
-  overview: null,
-  setDashboardOverview: (d) => set({ overview: d }),
-  setState: (s) => set({}),
-  setPaymentModes: (pm) => set({ paymentModes: pm }),
-  setCategories: (c) => set({ categories: c }),
-  triggerRefresh: () => set((state) => ({ refreshTrigger: state.refreshTrigger + 1 })),
-}));
+export const createDashboardSlice: StateCreator<DashboardState> = (set) => (
+  {
+    paymentModes: [],
+    categories: [],
+    refreshTrigger: 0,
+    overview: null,
+    setDashboardOverview: (d) => set({ overview: d }),
+    setState: (s) => set({}),
+    setPaymentModes: (pm) => set({ paymentModes: pm }),
+    setCategories: (c) => set({ categories: c }),
+    triggerRefresh: () => set((state) => ({ refreshTrigger: state.refreshTrigger + 1 })),
+  }
+);
+
+// export const useDashboardStore = create<DashboardState>((set) => ({
+//   paymentModes: [],
+//   categories: [],
+//   refreshTrigger: 0,
+//   overview: null,
+//   setDashboardOverview: (d) => set({ overview: d }),
+//   setState: (s) => set({}),
+//   setPaymentModes: (pm) => set({ paymentModes: pm }),
+//   setCategories: (c) => set({ categories: c }),
+//   triggerRefresh: () => set((state) => ({ refreshTrigger: state.refreshTrigger + 1 })),
+// }));
