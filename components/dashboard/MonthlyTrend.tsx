@@ -1,16 +1,15 @@
 "use client";
 
 import { useAppStore } from "@/store/useAppStore";
+import { MonthlyTrendDto } from "@/types/dashboard.dto";
 
 interface MonthlyTrendProps {
   variant?: "compact" | "detailed";
+  data: MonthlyTrendDto[];
+  isLoading: boolean;
 }
 
-export default function MonthlyTrend({ variant = "compact" }: MonthlyTrendProps) {
-  const overview = useAppStore((s) => s.overview);
-  const loading = !overview;
-
-  const trends = overview?.monthlyTrend || []
+export default function MonthlyTrend({ variant = "compact", data: trends, isLoading }: MonthlyTrendProps) {
 
   const formatCurrency = (val: number) => {
     return new Intl.NumberFormat("en-IN", {
@@ -68,7 +67,7 @@ export default function MonthlyTrend({ variant = "compact" }: MonthlyTrendProps)
         </div>
       </div>
 
-      {loading ? (
+      {isLoading ? (
         <div className={`${isDetailed ? "h-44" : "h-24"} flex items-center justify-center`}>
           <div className="text-xs text-zinc-500 animate-pulse">Loading trend...</div>
         </div>

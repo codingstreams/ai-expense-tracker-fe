@@ -133,7 +133,7 @@ export const categoryMetadataMap: Record<string, CategoryMeta> = {
     icon: Milk,
     color: "bg-sky-500/20 text-sky-500",
   },
-  "Food Delivery & Snacks": {
+  "Food & Snacks": {
     icon: Coffee,
     color: "bg-orange-600/20 text-orange-600",
   },

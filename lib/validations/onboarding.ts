@@ -4,7 +4,7 @@ export const onboardingSchema = z.object({
   languagePreference: z.string().length(2, { message: "Must be exactly 2 characters long" }),
   spendLimit: z.number().min(1, { message: "Must be greater than 1" }),
   currency: z.string().length(3, { message: "Must be exactly 3 characters long" }),
-  paymentMode: z.string().min(1, { message: "Payment mode is required" }),
+  paymentModeId: z.string().min(1, { message: "Payment mode is required" }),
   accounts: z.array(
     z.object({
       lastFourDigits: z.string().length(4, { message: "Must be exactly 4 digits" }),

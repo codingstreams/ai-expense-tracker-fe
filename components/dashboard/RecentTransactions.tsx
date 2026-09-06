@@ -6,12 +6,14 @@ import { ArrowDownRight, ArrowUpRight, Trash2 } from "lucide-react";
 import Link from "next/link";
 import NoTransactionsMsg from "../transactions/NoTransactionsMsg";
 import { useAppStore } from "@/store/useAppStore";
+import { TransactionResponseDto } from "@/types/transaction.dto";
 
-export default function RecentTransactions() {
-  const overview = useAppStore((s) => s.overview);
-  const loading = !overview;
+interface RecentTransactionsProps {
+  data: TransactionResponseDto[];
+  isLoading: boolean;
+}
 
-  const transactions = overview?.recentTransactions || []
+export default function RecentTransactions({ data: transactions, isLoading }: RecentTransactionsProps) {
 
   const handleDelete = async (id: string) => {
     try {
@@ -33,7 +35,7 @@ export default function RecentTransactions() {
     return val > 0 ? `+${formatted}` : `-${formatted}`;
   };
 
-  if (loading || transactions.length === 0) {
+  if (isLoading || transactions.length === 0) {
     return <NoTransactionsMsg />;
   }
 

@@ -31,7 +31,7 @@ export default function OnboardingPage() {
       languagePreference: "EN",
       spendLimit: 1000,
       currency: "INR",
-      paymentMode: "UPI",
+      paymentModeId: "UPI",
       accounts: [],
       cashBalance: 0,
     },
@@ -46,7 +46,7 @@ export default function OnboardingPage() {
           languagePreference: data.languagePreference,
           spendLimit: data.spendLimit,
           currency: data.currency,
-          paymentMode: data.paymentMode,
+          paymentMode: data.paymentModeId,
           isOnboardingComplete: true,
         },
         accounts: (data.accounts || []).map((acc) => ({

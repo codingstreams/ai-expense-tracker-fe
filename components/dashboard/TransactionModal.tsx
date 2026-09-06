@@ -63,6 +63,7 @@ export default function TransactionModal({
   useEffect(() => {
     if (!isOpen) return;
 
+    setValue("type", initialType)
     setValue("transactionDate", new Date().toISOString().split("T")[0]);
 
     if (categories.length == 0) {

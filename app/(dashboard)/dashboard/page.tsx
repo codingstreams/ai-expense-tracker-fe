@@ -12,39 +12,21 @@ import CategorySpend from "@/components/dashboard/CategorySpend";
 import AiChatWidget from "@/components/dashboard/AiChatWidget";
 import { dashboardService } from "@/services/dashboard.service";
 import { useAppStore } from "@/store/useAppStore";
+import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
 
 export default function DashboardPage() {
-  const router = useRouter();
-  const [mounted, setMounted] = useState(false);
   const isOnboarded = useAuthStore((state) => state.auth?.onboarded);
-  const { triggerRefresh, setDashboardOverview } = useAppStore();
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const { data: dashboardOverview, isLoading, isError, error } = useQuery({
+    queryKey: ['dashboardOverview'],
+    queryFn: dashboardService.getDashboardOverview,
+    staleTime: 1000 * 60 * 5,
+    enabled: isOnboarded
+  });
 
-  useEffect(() => {
-    console.log("Loading Dashboard...")
-
-    if (!mounted) return;
-
-    if (!isOnboarded) {
-      router.replace("/onboarding");
-      return;
-    }
-
-    dashboardService
-      .getDashboardOverview()
-      .then(setDashboardOverview)
-      .then(() => triggerRefresh())
-      .catch(() => { });
-  }, [mounted, isOnboarded, router]);
-
-  if (!mounted || !isOnboarded) {
-    return null;
-  }
 
   return (
+
     <div className="p-6 md:p-8 space-y-6 max-w-7xl mx-auto">
       <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <UserGreetings />
@@ -53,16 +35,16 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      <Summary />
+      <Summary data={dashboardOverview?.userSummary} isLoading={isLoading} isError={isError} error={error?.message ?? ""} />
 
-      <MonthlyTrend />
+      <MonthlyTrend data={dashboardOverview?.monthlyTrend ?? []} isLoading={isLoading} />
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         <div className="lg:col-span-3">
-          <RecentTransactions />
+          <RecentTransactions data={dashboardOverview?.recentTransactions ?? []} isLoading={isLoading} />
         </div>
         <div className="lg:col-span-2">
-          <CategorySpend />
+          <CategorySpend data={dashboardOverview?.categoryBreakdown ?? []} isLoading={isLoading} />
         </div>
       </div>
 

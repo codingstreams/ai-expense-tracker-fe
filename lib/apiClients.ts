@@ -24,7 +24,7 @@ export async function apiClient<T>(
     headers.set('Content-Type', 'application/json');
   }
 
-  const isAuthRoute = endpoint.includes('/users/me') || (endpoint.includes('/auth/') && !endpoint.includes('/auth/logout'));
+  const isAuthRoute = (endpoint.includes('/auth/') && !endpoint.includes('/auth/logout'));
   if (!isAuthRoute) {
     try {
       const store = useAuthStore.getState();

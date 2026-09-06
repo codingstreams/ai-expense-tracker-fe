@@ -1,19 +1,26 @@
 "use client";
 
-import { useAppStore } from "@/store/useAppStore";
+import { dashboardService } from "@/services/dashboard.service";
+import { UserSummaryDto } from "@/types/dashboard.dto";
+import { useQuery } from "@tanstack/react-query";
 import { Wallet, TrendingUp, TrendingDown, PiggyBank, Flame } from "lucide-react";
 
+interface SummaryProps {
+  data: UserSummaryDto | undefined;
+  isLoading: boolean;
+  isError: boolean;
+  error: string;
+}
 
-export default function Summary() {
-  const overview = useAppStore((state) => state.overview);
-  const loading = !overview;
+export default function Summary(props: SummaryProps) {
+
 
   const cards = [
-    { label: "Net Worth", value: overview?.userSummary.netWorth, icon: Wallet, color: "text-purple-400", cardBg: "bg-purple-950/20 border-purple-900/30", iconBg: "bg-purple-500/10 border-purple-500/20" },
-    { label: "Total Income", value: overview?.userSummary.totalIncome, icon: TrendingUp, color: "text-emerald-400", cardBg: "bg-emerald-950/20 border-emerald-900/30", iconBg: "bg-emerald-500/10 border-emerald-500/20" },
-    { label: "Total Expense", value: overview?.userSummary.totalExpense, icon: TrendingDown, color: "text-rose-400", cardBg: "bg-rose-950/20 border-rose-900/30", iconBg: "bg-rose-500/10 border-rose-500/20" },
-    { label: "Net Savings", value: overview?.userSummary.netSavings, icon: PiggyBank, color: "text-indigo-400", cardBg: "bg-indigo-950/20 border-indigo-900/30", iconBg: "bg-indigo-500/10 border-indigo-500/20" },
-    { label: "Daily Burn Rate", value: overview?.userSummary.dailyBurnRate, icon: Flame, color: "text-amber-400", cardBg: "bg-amber-950/20 border-amber-900/30", iconBg: "bg-amber-500/10 border-amber-500/20" },
+    { label: "Net Worth", value: props.data?.netWorth, icon: Wallet, color: "text-purple-400", cardBg: "bg-purple-950/20 border-purple-900/30", iconBg: "bg-purple-500/10 border-purple-500/20" },
+    { label: "Total Income", value: props.data?.totalIncome, icon: TrendingUp, color: "text-emerald-400", cardBg: "bg-emerald-950/20 border-emerald-900/30", iconBg: "bg-emerald-500/10 border-emerald-500/20" },
+    { label: "Total Expense", value: props.data?.totalExpense, icon: TrendingDown, color: "text-rose-400", cardBg: "bg-rose-950/20 border-rose-900/30", iconBg: "bg-rose-500/10 border-rose-500/20" },
+    { label: "Net Savings", value: props.data?.netSavings, icon: PiggyBank, color: "text-indigo-400", cardBg: "bg-indigo-950/20 border-indigo-900/30", iconBg: "bg-indigo-500/10 border-indigo-500/20" },
+    { label: "Daily Burn Rate", value: props.data?.dailyBurnRate, icon: Flame, color: "text-amber-400", cardBg: "bg-amber-950/20 border-amber-900/30", iconBg: "bg-amber-500/10 border-amber-500/20" },
   ];
 
   const formatCurrency = (val?: number) => {
@@ -34,7 +41,7 @@ export default function Summary() {
               <span className="text-[11px] font-medium uppercase tracking-wider text-zinc-400 block truncate">
                 {card.label}
               </span>
-              {loading ? (
+              {props.isLoading ? (
                 <div className="h-6 w-20 bg-zinc-800 animate-pulse rounded-md" />
               ) : (
                 <div className="text-lg font-bold text-white tracking-tight truncate">

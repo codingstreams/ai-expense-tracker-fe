@@ -76,11 +76,11 @@ export default function PreferencesSection() {
       setErrorMsg("");
       setSuccessMsg("");
 
-      await userService.updatePreferences({
+      await userService.updatePreferencesV2({
         languagePreference: formData.languagePreference,
         currency: formData.currency,
         spendLimit: Number(formData.spendLimit),
-        paymentMode: formData.paymentMode,
+        paymentModeId: formData.paymentMode,
       });
 
       const currentUser = useAuthStore.getState().user;
@@ -194,7 +194,7 @@ export default function PreferencesSection() {
                 className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3.5 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
               >
                 {paymentModes?.map(p => {
-                  return <option key={p.id} value={p.name}>{p.name}</option>
+                  return <option key={p.id} value={p.id}>{p.name}</option>
                 })}
               </select>
             </div>

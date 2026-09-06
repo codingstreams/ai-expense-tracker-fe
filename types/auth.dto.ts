@@ -30,3 +30,31 @@ export interface ApiResponse {
   message: string;
   timestamp: string;
 }
+
+export interface PaymentModeSummaryDto {
+  id: string;
+  name: string;
+}
+
+export interface AppUserConfigDto {
+  id: string;
+  languagePreference: string;
+  spendLimit: number;
+  currency: string;
+  paymentMode: PaymentModeSummaryDto | null;
+}
+
+export interface AppUserDto {
+  id: string;
+  name: string;
+  email: string;
+  isOnboardingComplete: boolean;
+  appUserConfig: AppUserConfigDto | null;
+}
+
+export interface UpdateAppUserConfigReq {
+  languagePreference?: string;
+  spendLimit?: number;
+  currency?: string;
+  paymentModeId?: string;
+}

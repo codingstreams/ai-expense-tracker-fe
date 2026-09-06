@@ -3,13 +3,14 @@
 import { TriangleAlert } from "lucide-react";
 import { categoryMetadataMap } from "./category.icons";
 import { useAppStore } from "@/store/useAppStore";
+import { CategoryBreakdownDto } from "@/types/dashboard.dto";
 
-export default function CategorySpend() {
-  const overview = useAppStore((s) => s.overview);
-  // const loading = !overview;
+interface CategorySpendProps {
+  data: CategoryBreakdownDto[],
+  isLoading: boolean;
+}
 
-  const categories = overview?.categoryBreakdown || []
-
+export default function CategorySpend({ data: categories, isLoading }: CategorySpendProps) {
   const totalSpent = categories.reduce((acc, c) => acc + c.totalAmount, 0);
 
   const formatCurrency = (val: number) => {
