@@ -1,34 +1,48 @@
 import { apiClient } from "@/lib/apiClients";
 import { AccountDto, BankDto } from "@/types/onboarding.dto";
 import { CardDto } from "@/types/transaction.dto";
+import { customInstance } from "./custom-instance";
+import {
+  getUserAccounts as getUserAccountsApi,
+  getUserCashAccountDetails as getCashAccountApi,
+  deleteAccount as deleteAccountApi,
+  addAccounts as addAccountsApi,
+  updateCashBalance as updateCashBalanceApi,
+} from "@/api/generated/account-controller/account-controller";
+import {
+  getUserCards as getUserCardsApi,
+  addCards as addCardsApi,
+} from "@/api/generated/card-controller/card-controller";
 
 export const accountService = {
-  async getCashAccount() {
-    return await apiClient<AccountDto>('/accounts/cash');
+  async getUserAccounts(): Promise<AccountDto[]> {
+    const res = await getUserAccountsApi();
+    return (res.data || []) as unknown as AccountDto[];
   },
 
-  async addAccount(account: AccountDto) {
-    return await apiClient<AccountDto>('/accounts', {
-      method: 'POST',
-      body: JSON.stringify({ accounts: [account] }),
-    });
+  async getCashAccount(): Promise<AccountDto> {
+    const res = await getCashAccountApi();
+    return res.data as unknown as AccountDto;
   },
 
-  async updateAccount(id: string, account: Partial<AccountDto>) {
-    return await apiClient<AccountDto>(`/accounts/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(account),
-    });
+  async getDebitCards(): Promise<CardDto[]> {
+    const res = await getUserCardsApi({ type: "DEBIT_CARD" });
+    return (res.data?.cards || []) as unknown as CardDto[];
   },
 
-  async updateCashBalance(cashBalance: number) {
-    return await apiClient<AccountDto>('/accounts/cash', { method: 'PUT', body: JSON.stringify({ cashBalance: cashBalance }) });
+  async getCreditCards(): Promise<CardDto[]> {
+    const res = await getUserCardsApi({ type: "CREDIT_CARD" });
+    return (res.data?.cards || []) as unknown as CardDto[];
   },
 
-  async deleteAccount(id: string) {
-    return await apiClient<void>(`/accounts/${id}`, {
-      method: 'DELETE',
-    });
+  async addAccount(account: AccountDto): Promise<AccountDto> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const res = await addAccountsApi({ accounts: [account as any] });
+    return res.data as unknown as AccountDto;
+  },
+
+  async deleteAccount(id: string): Promise<void> {
+    await deleteAccountApi(id);
   },
 
   async getUserAccounts(paymentMode?: string) {
@@ -54,16 +68,18 @@ export const accountService = {
     accountId?: string;
     limit?: number;
     bank?: BankDto;
-  }) {
-    return await apiClient<CardDto>('/cards', {
-      method: 'POST',
-      body: JSON.stringify({ cards: [payload] }),
-    });
+  }): Promise<CardDto> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const res = await addCardsApi({ cards: [payload as any] });
+    return res.data as unknown as CardDto;
   },
 
-  async deleteCard(cardId: string) {
-    return await apiClient<void>(`/cards/${cardId}`, {
-      method: 'DELETE',
-    });
+  async deleteCard(cardId: string): Promise<void> {
+    await customInstance<void>(`/api/cards/${cardId}`, { method: "DELETE" });
+  },
+
+  async updateCashBalance(cashBalance: number): Promise<AccountDto> {
+    const res = await updateCashBalanceApi({ cashBalance });
+    return res.data as unknown as AccountDto;
   },
 };

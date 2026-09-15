@@ -3,14 +3,13 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { registerSchema } from '@/lib/validations/auth';
+import { useMutation } from '@tanstack/react-query';
+
 import { useAuthStore } from '@/store/useAuthStore';
 import { useRouter } from 'next/navigation';
 import { Lock, Mail, User, Loader2, AlertCircle } from 'lucide-react';
 import { z } from 'zod';
 import { authService } from '@/services/auth.service';
-
-type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -20,15 +19,19 @@ export default function RegisterForm() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
+  });
+
+  const { mutateAsync: registerMutate, isPending } = useMutation({
+    mutationFn: (data: RegisterFormValues) => authService.register(data),
   });
 
   const onSubmit = async (data: RegisterFormValues) => {
     try {
       setErrorMsg('');
-      const { auth, user } = await authService.register(data);
+      const { auth, user } = await registerMutate(data);
       setAuth(auth, user);
       router.push(user.isOnboardingComplete ? '/dashboard' : '/onboarding');
     } catch (error: unknown) {
@@ -114,10 +117,10 @@ export default function RegisterForm() {
 
         <button
           type="submit"
-          disabled={isSubmitting}
+          disabled={isPending}
           className="w-full rounded-xl bg-purple-600 py-3 text-sm font-semibold text-white transition hover:bg-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-zinc-900 disabled:opacity-50 shadow-lg shadow-purple-950/50"
         >
-          {isSubmitting ? <Loader2 className="mx-auto h-4 w-4 animate-spin" /> : 'Sign Up'}
+          {isPending ? <Loader2 className="mx-auto h-4 w-4 animate-spin" /> : 'Sign Up'}
         </button>
       </form>
     </div>

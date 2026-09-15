@@ -1,19 +1,40 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Sparkles, Plus, ChevronDown, ArrowDownRight, ArrowUpRight, ArrowLeftRight, CornerDownLeft, Loader2 } from "lucide-react";
-import TransactionModal from "@/components/dashboard/TransactionModal";
-import { transactionService } from "@/services/transaction.service";
-import { notificationService } from "@/services/notification.service";
-import { useAppStore } from "@/store/useAppStore";
+import {
+  Sparkles,
+  Plus,
+  ChevronDown,
+  ArrowDownRight,
+  ArrowUpRight,
+  ArrowLeftRight,
+  CornerDownLeft,
+  Loader2,
+} from "lucide-react";
+import { useDashboardStore } from "@/store/useDashboardStore";
+import { useParseRawText } from "@/api/generated/ai-controller/ai-controller";
+import {
+  getGetRecentTransactionsQueryKey,
+  getGetAllTransactionsQueryKey,
+} from "@/api/generated/transaction-controller/transaction-controller";
+import {
+  getGetSummaryQueryKey,
+  getGetMonthlyTrendQueryKey,
+  getGetCategoryBreakdownQueryKey,
+} from "@/api/generated/dashboard-controller/dashboard-controller";
+import { useQueryClient } from "@tanstack/react-query";
+import TransactionModal from "./TransactionModal";
+import { notificationService } from "@/service/notification.service";
 
-export default function QuickActionCommandBar() {
-  const [nlQuery, setNlQuery] = useState("");
+export default function QuickInputBar() {
+  const queryClient = useQueryClient();
   const [menuOpen, setMenuOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalType, setModalType] = useState<"EXPENSE" | "INCOME" | "TRANSFER">("EXPENSE");
   const [processing, setProcessing] = useState(false);
   const unsubscribeRef = useRef<(() => void) | null>(null);
+
+  const { mutateAsync: parseRawTextMutate } = useParseRawText();
 
   useEffect(() => {
     return () => {
@@ -23,21 +44,29 @@ export default function QuickActionCommandBar() {
     };
   }, []);
 
+  const invalidateQueries = () => {
+    queryClient.invalidateQueries({ queryKey: getGetRecentTransactionsQueryKey() });
+    queryClient.invalidateQueries({ queryKey: getGetAllTransactionsQueryKey() });
+    queryClient.invalidateQueries({ queryKey: getGetSummaryQueryKey() });
+    queryClient.invalidateQueries({ queryKey: getGetMonthlyTrendQueryKey() });
+    queryClient.invalidateQueries({ queryKey: getGetCategoryBreakdownQueryKey() });
+    useDashboardStore.getState().triggerRefresh();
+  };
+
   const openModal = (type: "EXPENSE" | "INCOME" | "TRANSFER") => {
     setModalType(type);
     setModalOpen(true);
     setMenuOpen(false);
   };
 
-  const handleNlSubmit = async (e: React.SubmitEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
     if (!nlQuery.trim() || processing) return;
 
     try {
       setProcessing(true);
-      const query = nlQuery.trim();
-
-      const task = await transactionService.addTransactionUsingAi({ rawText: query });
+      const res = await parseRawTextMutate({ data: { rawText: query.trim() } });
+      const task = res.data;
 
       if (task?.id) {
         if (unsubscribeRef.current) {
@@ -48,8 +77,8 @@ export default function QuickActionCommandBar() {
           task.id,
           () => {
             setProcessing(false);
-            setNlQuery("");
-            useAppStore.getState().triggerRefresh();
+            setQuery("");
+            invalidateQueries();
             if (unsubscribeRef.current) {
               unsubscribeRef.current();
               unsubscribeRef.current = null;
@@ -57,13 +86,13 @@ export default function QuickActionCommandBar() {
           },
           () => {
             setProcessing(false);
-            useAppStore.getState().triggerRefresh();
+            invalidateQueries();
           }
         );
       } else {
         setProcessing(false);
-        setNlQuery("");
-        useAppStore.getState().triggerRefresh();
+        setQuery("");
+        invalidateQueries();
       }
     } catch {
       setProcessing(false);
@@ -74,7 +103,7 @@ export default function QuickActionCommandBar() {
     <>
       <div className="relative rounded-2xl border border-purple-500/30 bg-gradient-to-r from-purple-950/40 via-zinc-900 to-zinc-900 p-2 shadow-xl shadow-purple-950/20 backdrop-blur-md">
         <div className="flex flex-col sm:flex-row items-center gap-2">
-          <form onSubmit={handleNlSubmit} className="relative flex-1 w-full flex items-center">
+          <form onSubmit={handleSubmit} className="relative flex-1 w-full flex items-center">
             <div className="absolute left-3.5 flex items-center text-purple-400">
               {processing ? (
                 <Loader2 className="h-4 w-4 animate-spin text-purple-400" />
@@ -119,15 +148,27 @@ export default function QuickActionCommandBar() {
 
             {menuOpen && (
               <div className="absolute right-0 mt-2 w-48 rounded-xl border border-zinc-800 bg-zinc-900 p-1.5 shadow-2xl z-40 space-y-1">
-                <button type="button" onClick={() => openModal("EXPENSE")} className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-zinc-200 hover:bg-zinc-800/80 hover:text-rose-400 rounded-lg transition-colors">
+                <button
+                  type="button"
+                  onClick={() => openModal("EXPENSE")}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-zinc-200 hover:bg-zinc-800/80 hover:text-rose-400 rounded-lg transition-colors"
+                >
                   <ArrowDownRight className="h-4 w-4 text-rose-400" />
                   <span>Expense</span>
                 </button>
-                <button type="button" onClick={() => openModal("INCOME")} className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-zinc-200 hover:bg-zinc-800/80 hover:text-emerald-400 rounded-lg transition-colors">
+                <button
+                  type="button"
+                  onClick={() => openModal("INCOME")}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-zinc-200 hover:bg-zinc-800/80 hover:text-emerald-400 rounded-lg transition-colors"
+                >
                   <ArrowUpRight className="h-4 w-4 text-emerald-400" />
                   <span>Income</span>
                 </button>
-                <button type="button" onClick={() => openModal("TRANSFER")} className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-zinc-200 hover:bg-zinc-800/80 hover:text-indigo-400 rounded-lg transition-colors">
+                <button
+                  type="button"
+                  onClick={() => openModal("TRANSFER")}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-zinc-200 hover:bg-zinc-800/80 hover:text-indigo-400 rounded-lg transition-colors"
+                >
                   <ArrowLeftRight className="h-4 w-4 text-indigo-400" />
                   <span>Transfer</span>
                 </button>
@@ -137,8 +178,11 @@ export default function QuickActionCommandBar() {
         </div>
       </div>
 
-      <TransactionModal isOpen={modalOpen} onClose={() => setModalOpen(false)} initialType={modalType} />
+      <TransactionModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        initialType={modalType}
+      />
     </>
   );
 }
-

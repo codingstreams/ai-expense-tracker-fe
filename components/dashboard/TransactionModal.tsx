@@ -5,14 +5,25 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { X, ArrowDownRight, ArrowUpRight, ArrowLeftRight } from "lucide-react";
-import { CategoryDto, CardDto } from "@/types/transaction.dto";
-import { AccountDto, PaymentModeDto } from "@/types/onboarding.dto";
-import { transactionService } from "@/services/transaction.service";
-import { accountService } from "@/services/account.service";
-import { onboardingService } from "@/services/onboarding.service";
-import { transactionSchema, TransactionFormValues } from "@/lib/validations/transaction";
-import { useAppStore } from "@/store/useAppStore";
-
+import { useDashboardStore } from "@/store/useDashboardStore";
+import { TransactionFormValues, transactionSchema } from "@/validations/transaction";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  useCreateTransaction,
+  getGetRecentTransactionsQueryKey,
+} from "@/api/generated/transaction-controller/transaction-controller";
+import {
+  getGetSummaryQueryKey,
+  getGetMonthlyTrendQueryKey,
+  getGetCategoryBreakdownQueryKey,
+} from "@/api/generated/dashboard-controller/dashboard-controller";
+import { useGetSystemCategories } from "@/api/generated/sys-category-controller/sys-category-controller";
+import { useGetPaymentModes } from "@/api/generated/payment-mode-controller/payment-mode-controller";
+import {
+  useGetUserAccounts,
+  useGetUserCashAccountDetails,
+} from "@/api/generated/account-controller/account-controller";
+import { useGetUserCards } from "@/api/generated/card-controller/card-controller";
 
 interface TransactionModalProps {
   isOpen: boolean;
@@ -27,11 +38,28 @@ export default function TransactionModal({
   initialType = "EXPENSE",
   onSuccess,
 }: TransactionModalProps) {
-  const [cashAcc, setCashAcc] = useState<AccountDto | null>(null);
-  const { paymentModes, categories, setPaymentModes, setCategories } = useAppStore();
-  const [accounts, setAccounts] = useState<AccountDto[]>([]);
-  const [debitCards, setDebitCards] = useState<CardDto[]>([]);
-  const [creditCards, setCreditCards] = useState<CardDto[]>([]);
+  const queryClient = useQueryClient();
+  const [transactionType, setTransactionType] = useState<"EXPENSE" | "INCOME" | "TRANSFER">(initialType);
+
+  const { data: categoriesData } = useGetSystemCategories({ query: { enabled: isOpen } });
+  const { data: paymentModesData } = useGetPaymentModes({ query: { enabled: isOpen } });
+  const { data: accountsData } = useGetUserAccounts({ query: { enabled: isOpen } });
+  const { data: cashAccData } = useGetUserCashAccountDetails({ query: { enabled: isOpen } });
+  const { data: debitCardsData } = useGetUserCards({ type: "DEBIT_CARD" }, { query: { enabled: isOpen } });
+  const { data: creditCardsData } = useGetUserCards({ type: "CREDIT_CARD" }, { query: { enabled: isOpen } });
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const categories = (categoriesData?.data || []) as any[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const paymentModes = (paymentModesData?.data || []) as any[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const accounts = (accountsData?.data || []) as any[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const cashAcc = (cashAccData?.data || null) as any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const debitCards = (debitCardsData?.data?.cards || []) as any[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const creditCards = (creditCardsData?.data?.cards || []) as any[];
 
   const {
     register,
@@ -62,25 +90,8 @@ export default function TransactionModal({
 
   useEffect(() => {
     if (!isOpen) return;
-
-    setValue("type", initialType)
     setValue("transactionDate", new Date().toISOString().split("T")[0]);
-
-    if (categories.length == 0) {
-      console.log("Initializing Categories...")
-      transactionService.getCategories().then(setCategories).catch(() => { });
-      console.log("Initialized Categories")
-    }
-
-    if (paymentModes.length == 0) {
-      console.log("Initializing Payment Modes...")
-      onboardingService.getSupportedPaymentModes().then(setPaymentModes).catch(() => { });
-      console.log("Initialized Payment Modes")
-    }
-
-    accountService.getUserAccounts().then(setAccounts).catch(() => { });
-    accountService.getCashAccount().then(setCashAcc).catch(() => { });
-  }, [isOpen, setValue]);
+  }, [isOpen, setValue, transactionType]);
 
   useEffect(() => {
     if (!isOpen || !selectedPaymentModeId) return;
@@ -90,25 +101,12 @@ export default function TransactionModal({
 
     if (modeName.includes("cash")) {
       if (cashAcc) {
-        setValue("accountId", cashAcc.id);
-      } else {
-        accountService.getCashAccount().then((acc) => {
-          setCashAcc(acc);
-          setValue("accountId", acc.id);
-        }).catch(() => { });
+        setValue("accountId", cashAcc.id || cashAcc.lastFourDigits);
       }
     } else {
       if (currentType === "EXPENSE") {
         setValue("accountId", "");
       }
-    }
-
-    if (modeName.includes("upi") || modeName.includes("netbanking") || modeName.includes("net banking")) {
-      accountService.getUserAccounts(selectedMode?.name).then(setAccounts).catch(() => { });
-    } else if (modeName.includes("debit")) {
-      accountService.getDebitCards().then(setDebitCards).catch(() => { });
-    } else if (modeName.includes("credit")) {
-      accountService.getCreditCards().then(setCreditCards).catch(() => { });
     }
   }, [selectedPaymentModeId, paymentModes, isOpen, cashAcc, currentType, setValue]);
 
@@ -121,6 +119,22 @@ export default function TransactionModal({
       setValue("description", `Transfer from ${fromLabel} to ${toLabel}`);
     }
   }, [currentType, sourceAccountId, destAccountId, accounts, setValue]);
+
+  const { mutateAsync: createTxMutate, isPending: isCreating } = useCreateTransaction({
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: getGetRecentTransactionsQueryKey() });
+        queryClient.invalidateQueries({ queryKey: ["transactions"] });
+        queryClient.invalidateQueries({ queryKey: getGetSummaryQueryKey() });
+        queryClient.invalidateQueries({ queryKey: getGetMonthlyTrendQueryKey() });
+        queryClient.invalidateQueries({ queryKey: getGetCategoryBreakdownQueryKey() });
+        useDashboardStore.getState().triggerRefresh();
+        reset();
+        onSuccess?.();
+        onClose();
+      },
+    },
+  });
 
   if (!isOpen) return null;
 
@@ -168,17 +182,16 @@ export default function TransactionModal({
         description = `Transfer from ${fromLabel} to ${toLabel}`;
       }
 
-      await transactionService.createTransaction({
-        ...data,
-        accountId,
-        description: description || data.type,
-        transactionDate: data.transactionDate || new Date().toISOString().split("T")[0],
+      await createTxMutate({
+        data: {
+          ...data,
+          accountId,
+          description: description || data.type,
+          transactionDate: data.transactionDate || new Date().toISOString().split("T")[0],
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          type: data.type as any,
+        },
       });
-
-      useAppStore.getState().triggerRefresh();
-      reset();
-      onSuccess?.();
-      onClose();
     } catch (err) {
       console.error(err);
     }
@@ -485,10 +498,10 @@ export default function TransactionModal({
             </button>
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || isCreating}
               className="flex-1 rounded-xl bg-indigo-600 hover:bg-indigo-500 py-2.5 text-xs font-semibold text-white transition-colors shadow-lg shadow-indigo-950/50 disabled:opacity-50"
             >
-              {isSubmitting ? "Saving..." : "Save Transaction"}
+              {isSubmitting || isCreating ? "Saving..." : "Save Transaction"}
             </button>
           </div>
         </form>
