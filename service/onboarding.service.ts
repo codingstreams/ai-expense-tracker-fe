@@ -1,13 +1,10 @@
-import { apiClient } from "@/lib/apiClients";
-import { LanguagePreferenceDto, OnboardingDto, PaymentModeDto } from "@/types/onboarding.dto";
+import { LanguagePreferenceDto, OnboardingDto } from "@/types/onboarding.dto";
+import { apiClient } from "./apiClient";
+import { PaymentModeDto } from "@/types/transaction.dto";
 
 export const onboardingService = {
   async getSupportedLanguagePreferences() {
     return await apiClient<LanguagePreferenceDto>('/dashboard/language-preferences');
-  },
-
-  async getSupportedPaymentModes() {
-    return await apiClient<PaymentModeDto[]>('/payment-modes');
   },
 
   async onboardUser(requestBody: OnboardingDto) {
@@ -16,4 +13,8 @@ export const onboardingService = {
       body: JSON.stringify(requestBody),
     });
   },
-};
+
+  async getSupportedPaymentModes() {
+    return await apiClient<PaymentModeDto[]>('/payment-modes');
+  },
+}

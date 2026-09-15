@@ -2,14 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Sparkles, X, Send, Bot, RotateCcw, Loader2 } from "lucide-react";
-import { chatService } from "@/services/chat.service";
+import { chatService } from "@/service/chat.service";
 
 interface Message {
   role: "user" | "ai";
   text: string;
 }
 
-export default function AiChatWidget() {
+export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -42,8 +42,8 @@ export default function AiChatWidget() {
     try {
       const audio = new Audio("/sounds/message_bubble_pop_sound.mp3");
       audio.volume = 0.4;
-      audio.play().catch(() => {});
-    } catch {}
+      audio.play().catch(() => { });
+    } catch { }
   };
 
   const handleResetSession = () => {
@@ -68,12 +68,12 @@ export default function AiChatWidget() {
       const activeSession = sessionId || `session_${Date.now()}`;
       const res = await chatService.chat({
         message: query,
-        seesionId: activeSession,
+        sessionId: activeSession,
       });
 
-      if (res?.seesionId) {
-        setSessionId(res.seesionId);
-        localStorage.setItem("spendai_chat_session_id", res.seesionId);
+      if (res?.sessionId) {
+        setSessionId(res.sessionId);
+        localStorage.setItem("spendai_chat_session_id", res.sessionId);
       }
 
       setMessages((prev) => [
@@ -140,11 +140,10 @@ export default function AiChatWidget() {
             {messages.map((m, idx) => (
               <div key={idx} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
                 <div
-                  className={`max-w-[85%] p-2.5 rounded-xl whitespace-pre-wrap leading-relaxed ${
-                    m.role === "user"
-                      ? "bg-purple-600 text-white"
-                      : "bg-zinc-950 border border-zinc-800 text-zinc-200"
-                  }`}
+                  className={`max-w-[85%] p-2.5 rounded-xl whitespace-pre-wrap leading-relaxed ${m.role === "user"
+                    ? "bg-purple-600 text-white"
+                    : "bg-zinc-950 border border-zinc-800 text-zinc-200"
+                    }`}
                 >
                   {m.text}
                 </div>

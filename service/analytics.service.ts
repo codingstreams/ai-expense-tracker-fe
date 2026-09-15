@@ -1,5 +1,6 @@
-import { apiClient } from "@/lib/apiClients";
+
 import { AiInsightDto } from "@/types/analytics.dto";
+import { apiClient } from "./apiClient";
 
 export const analyticsService = {
   async getAiInsights() {

@@ -5,13 +5,14 @@ import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import LogoutButton from "@/components/auth/LogoutButton";
-import UserGreetings from "@/components/dashboard/UserGreetings";
 import AccountsStep from "@/components/onboarding/AccountsStep";
 import CashStep from "@/components/onboarding/CashStep";
-import PreferencesStep from "@/components/onboarding/PreferencesStep";
-import { onboardingService } from "@/services/onboarding.service";
-import { OnboardingFormValues, onboardingSchema } from "@/lib/validations/onboarding";
+
 import { useAuthStore } from "@/store/useAuthStore";
+import { onboardingService } from "@/service/onboarding.service";
+import { OnboardingFormValues, onboardingSchema } from "@/validations/onboarding";
+import UserPreferences from "@/components/onboarding/UserPreferences";
+import UserGreetings from "@/components/dashboard/UserGreetings";
 
 export default function OnboardingPage() {
   const [submitting, setSubmitting] = useState(false);
@@ -86,7 +87,7 @@ export default function OnboardingPage() {
 
         <FormProvider {...methods}>
           <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-6">
-            <PreferencesStep />
+            <UserPreferences />
             <CashStep />
             <AccountsStep />
 

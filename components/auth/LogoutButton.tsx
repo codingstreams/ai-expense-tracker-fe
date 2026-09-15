@@ -3,6 +3,7 @@
 import { useAuthStore } from '@/store/useAuthStore';
 import { useRouter } from 'next/navigation';
 import { LogOut } from 'lucide-react';
+import { authService } from '@/service/auth.service';
 
 interface LogoutButtonProps {
   iconOnly?: boolean;
@@ -13,8 +14,13 @@ export default function LogoutButton({ iconOnly = false }: LogoutButtonProps) {
   const logout = useAuthStore((state) => state.logout);
 
   const handleLogout = () => {
-    logout();
-    router.push('/auth?mode=login');
+    authService.logout()
+      .then(() => {
+        logout();
+      })
+      .finally(() => {
+        router.push('/auth?mode=login');
+      })
   };
 
   if (iconOnly) {

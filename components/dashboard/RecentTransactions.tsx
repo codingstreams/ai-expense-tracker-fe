@@ -1,12 +1,13 @@
 "use client";
 
-import { transactionService } from "@/services/transaction.service";
-
+import { transactionService } from "@/service/transaction.service";
+import { useDashboardStore } from "@/store/useDashboardStore";
 import { ArrowDownRight, ArrowUpRight, Trash2 } from "lucide-react";
 import Link from "next/link";
-import NoTransactionsMsg from "../transactions/NoTransactionsMsg";
-import { useAppStore } from "@/store/useAppStore";
+import { useEffect, useState } from "react";
+import EmptyTransactionList from "./transactions/EmptyTransactionList";
 import { TransactionResponseDto } from "@/types/transaction.dto";
+
 
 interface RecentTransactionsProps {
   data: TransactionResponseDto[];
@@ -35,8 +36,8 @@ export default function RecentTransactions({ data: transactions, isLoading }: Re
     return val > 0 ? `+${formatted}` : `-${formatted}`;
   };
 
-  if (isLoading || transactions.length === 0) {
-    return <NoTransactionsMsg />;
+  if (transactions.length === 0) {
+    return <EmptyTransactionList />;
   }
 
 

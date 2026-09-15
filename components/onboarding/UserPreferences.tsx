@@ -1,20 +1,28 @@
 "use client";
 
-import { onboardingService } from "@/service/onboarding.service";
-import { OnboardingFormValues } from "@/validations/onboarding";
 import { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
+import { OnboardingFormValues } from "@/validations/onboarding";
+import { onboardingService } from "@/service/onboarding.service";
+import { PaymentModeDto } from "@/types/transaction.dto";
 
-
-export default function PreferencesStep() {
+export default function UserPreferences() {
   const { register, formState: { errors } } = useFormContext<OnboardingFormValues>();
   const [languages, setLanguages] = useState<string[]>(["EN", "HI", "ES", "FR"]);
+  const [payementModes, setPaymentModes] = useState<PaymentModeDto[]>([]);
 
   useEffect(() => {
     onboardingService
       .getSupportedLanguagePreferences()
       .then((res) => {
         if (res?.options?.length) setLanguages(res.options);
+      })
+      .catch(() => { });
+
+    onboardingService
+      .getSupportedPaymentModes()
+      .then((res) => {
+        if (res?.length) setPaymentModes(res);
       })
       .catch(() => { });
   }, []);
@@ -65,16 +73,20 @@ export default function PreferencesStep() {
         <div>
           <label className="block text-xs font-medium uppercase tracking-wider text-zinc-400 mb-1.5">Preferred Payment Mode</label>
           <select
-            {...register("paymentModeId")}
+            {...register("paymentMode")}
             className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3.5 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
           >
             <option value="">Select Mode</option>
+            {payementModes.map((pm, idx) => {
+              return <option key={idx} value={pm.name}>{pm.name}</option>
+            })}
+            {/* <option value="">Select Mode</option>
             <option value="UPI">UPI</option>
             <option value="CARD">Card</option>
             <option value="NET_BANKING">Net Banking</option>
-            <option value="CASH">Cash</option>
+            <option value="CASH">Cash</option> */}
           </select>
-          {errors.paymentModeId && <p className="text-xs text-red-400 mt-1">{errors.paymentModeId.message}</p>}
+          {errors.paymentMode && <p className="text-xs text-red-400 mt-1">{errors.paymentMode.message}</p>}
         </div>
       </div>
     </div>

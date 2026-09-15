@@ -4,7 +4,8 @@ export const onboardingSchema = z.object({
   languagePreference: z.string().length(2, { message: "Must be exactly 2 characters long" }),
   spendLimit: z.number().min(1, { message: "Must be greater than 1" }),
   currency: z.string().length(3, { message: "Must be exactly 3 characters long" }),
-  paymentModeId: z.string().min(1, { message: "Payment mode is required" }),
+  paymentMode: z.string().min(1, { message: "Payment mode is required" }),
+  cashBalance: z.number().min(0, { message: "Cash balance cannot be negative" }),
   accounts: z.array(
     z.object({
       lastFourDigits: z.string().length(4, { message: "Must be exactly 4 digits" }),
@@ -17,8 +18,7 @@ export const onboardingSchema = z.object({
       isUpiEnabled: z.boolean().optional(),
       isNetBankingEnabled: z.boolean().optional()
     })
-  ).optional(),
-  cashBalance: z.number().min(0, { message: "Cash balance cannot be negative" })
+  ).optional()
 });
 
 export type OnboardingFormValues = z.infer<typeof onboardingSchema>;

@@ -7,8 +7,6 @@ import { dashboardService } from "@/service/dashboard.service";
 
 interface MonthlyTrendProps {
   variant?: "compact" | "detailed";
-  data: MonthlyTrendDto[];
-  isLoading: boolean;
 }
 
 export default function MonthlyTrend({ variant = "compact" }: MonthlyTrendProps) {
@@ -82,7 +80,7 @@ export default function MonthlyTrend({ variant = "compact" }: MonthlyTrendProps)
         </div>
       </div>
 
-      {isLoading ? (
+      {loading ? (
         <div className={`${isDetailed ? "h-44" : "h-24"} flex items-center justify-center`}>
           <div className="text-xs text-zinc-500 animate-pulse">Loading trend...</div>
         </div>

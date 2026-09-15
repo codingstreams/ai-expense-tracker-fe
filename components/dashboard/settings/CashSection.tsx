@@ -32,7 +32,7 @@ export default function CashSection() {
       setSuccessMsg("");
 
       await accountService.updateCashBalance(Number(balance));
-      useAppStore.getState().triggerRefresh();
+      useDashboardStore.getState().triggerRefresh();
 
       setSuccessMsg("Cash balance updated!");
       setTimeout(() => setSuccessMsg(""), 3500);

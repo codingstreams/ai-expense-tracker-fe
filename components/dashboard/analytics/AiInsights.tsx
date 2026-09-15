@@ -1,9 +1,9 @@
 "use client";
-
-import { useEffect, useState } from "react";
-import { Sparkles, AlertTriangle, Lightbulb, TrendingUp, RefreshCw } from "lucide-react";
-import { AiInsightDto } from "@/types/analytics.dto";
 import { analyticsService } from "@/service/analytics.service";
+import { AiInsightDto } from "@/types/analytics.dto";
+import { Sparkles, RefreshCw, TrendingUp, AlertTriangle, Lightbulb } from "lucide-react";
+import { useState, useEffect } from "react";
+
 
 export default function AiInsights() {
   const [insight, setInsight] = useState<AiInsightDto | null>(null);

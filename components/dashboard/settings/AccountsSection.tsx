@@ -51,7 +51,7 @@ export default function AccountsSection() {
     try {
       await accountService.deleteAccount(id);
       setAccounts((prev) => prev.filter((a) => a.id !== id));
-      useAppStore.getState().triggerRefresh();
+      useDashboardStore.getState().triggerRefresh();
       setSuccessMsg("Account removed successfully!");
       setTimeout(() => setSuccessMsg(""), 3500);
     } catch (err) {
@@ -95,7 +95,7 @@ export default function AccountsSection() {
       });
       setModalOpen(false);
       await loadAccounts();
-      useAppStore.getState().triggerRefresh();
+      useDashboardStore.getState().triggerRefresh();
       setSuccessMsg("Bank account added successfully!");
       setTimeout(() => setSuccessMsg(""), 3500);
     } catch (err: unknown) {

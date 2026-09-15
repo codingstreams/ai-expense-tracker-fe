@@ -1,11 +1,10 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { Check, AlertCircle, Save } from "lucide-react";
-import { useAuthStore } from "@/store/useAuthStore";
-import { PaymentModeDto } from "@/types/onboarding.dto";
 import { onboardingService } from "@/service/onboarding.service";
 import { userService } from "@/service/user.service";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useDashboardStore } from "@/store/useDashboardStore";
+import { PaymentModeDto } from "@/types/transaction.dto";
+import { Check, AlertCircle, Save } from "lucide-react";
+import { useState, useEffect } from "react";
 
 export default function PreferencesSection() {
   const [languages, setLanguages] = useState<string[]>(["EN", "HI", "ES", "FR"]);
@@ -75,11 +74,11 @@ export default function PreferencesSection() {
       setErrorMsg("");
       setSuccessMsg("");
 
-      await userService.updatePreferencesV2({
+      await userService.updatePreferences({
         languagePreference: formData.languagePreference,
         currency: formData.currency,
         spendLimit: Number(formData.spendLimit),
-        paymentModeId: formData.paymentMode,
+        paymentMode: formData.paymentMode,
       });
 
       const currentUser = useAuthStore.getState().user;
@@ -95,7 +94,7 @@ export default function PreferencesSection() {
         });
       }
 
-      useAppStore.getState().triggerRefresh();
+      useDashboardStore.getState().triggerRefresh();
       setSuccessMsg("Preferences saved successfully!");
       setTimeout(() => setSuccessMsg(""), 3500);
     } catch (err: unknown) {
@@ -193,7 +192,7 @@ export default function PreferencesSection() {
                 className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3.5 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
               >
                 {paymentModes?.map(p => {
-                  return <option key={p.id} value={p.id}>{p.name}</option>
+                  return <option key={p.id} value={p.name}>{p.name}</option>
                 })}
               </select>
             </div>

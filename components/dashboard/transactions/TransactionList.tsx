@@ -3,8 +3,10 @@
 import { ArrowDownRight, ArrowUpRight, ArrowLeftRight, ChevronLeft, ChevronRight, Inbox, Trash2 } from "lucide-react";
 import { PagedTransactionsDto } from "@/types/transaction.dto";
 
-import NoTransactionsMsg from "./NoTransactionsMsg";
+import { useDashboardStore } from "@/store/useDashboardStore";
+import EmptyTransactionList from "./EmptyTransactionList";
 import { transactionService } from "@/service/transaction.service";
+
 
 interface TransactionListProps {
   pagedData: PagedTransactionsDto | null;
@@ -30,7 +32,7 @@ export default function TransactionList({ pagedData, loading, onPageChange, onDe
   const handleDelete = async (id: string) => {
     try {
       await transactionService.deleteTransaction(id);
-      useAppStore.getState().triggerRefresh();
+      useDashboardStore.getState().triggerRefresh();
       onDelete?.(id);
     } catch (err) {
       console.error(err);
@@ -53,7 +55,7 @@ export default function TransactionList({ pagedData, loading, onPageChange, onDe
   }
 
   if (items.length === 0) {
-    return <NoTransactionsMsg />;
+    return <EmptyTransactionList />;
   }
 
   return (
