@@ -1,17 +1,16 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useState } from "react";
 import { Plus } from "lucide-react";
 import TransactionModal from "@/components/dashboard/TransactionModal";
 import TransactionFilters, { FilterState } from "@/components/dashboard/transactions/TransactionFilters";
 import TransactionList from "@/components/dashboard/transactions/TransactionList";
 import { TransactionFilterParams, transactionService } from "@/service/transaction.service";
-import { PagedTransactionsDto } from "@/types/transaction.dto";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export default function TransactionsPage() {
+  const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [pagedData, setPagedData] = useState<PagedTransactionsDto | null>(null);
   const [filters, setFilters] = useState<FilterState>({
     type: "",
     category: "",
@@ -22,31 +21,21 @@ export default function TransactionsPage() {
   });
   const [page, setPage] = useState(0);
 
-  const fetchTransactions = useCallback(async (currentPage: number, currentFilters: FilterState) => {
-    try {
-      setLoading(true);
-      const params: TransactionFilterParams = {
-        page: currentPage,
-        size: 10,
-        type: currentFilters.type || undefined,
-        category: currentFilters.category || undefined,
-        startDate: currentFilters.startDate || undefined,
-        endDate: currentFilters.endDate || undefined,
-        minAmount: currentFilters.minAmount ? Number(currentFilters.minAmount) : undefined,
-        maxAmount: currentFilters.maxAmount ? Number(currentFilters.maxAmount) : undefined,
-      };
-      const res = await transactionService.getAllTransactions(params);
-      setPagedData(res);
-    } catch {
-      setPagedData(null);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const queryParams: TransactionFilterParams = {
+    page,
+    size: 10,
+    type: filters.type || undefined,
+    category: filters.category || undefined,
+    startDate: filters.startDate || undefined,
+    endDate: filters.endDate || undefined,
+    minAmount: filters.minAmount ? Number(filters.minAmount) : undefined,
+    maxAmount: filters.maxAmount ? Number(filters.maxAmount) : undefined,
+  };
 
-  useEffect(() => {
-    fetchTransactions(page, filters);
-  }, [page, filters, fetchTransactions]);
+  const { data: pagedData, isLoading: loading } = useQuery({
+    queryKey: ["transactions", queryParams],
+    queryFn: () => transactionService.getAllTransactions(queryParams),
+  });
 
   const handleFilterChange = (key: keyof FilterState, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -56,6 +45,10 @@ export default function TransactionsPage() {
   const handleReset = () => {
     setFilters({ type: "", category: "", startDate: "", endDate: "", minAmount: "", maxAmount: "" });
     setPage(0);
+  };
+
+  const refreshData = () => {
+    queryClient.invalidateQueries({ queryKey: ["transactions"] });
   };
 
   return (
@@ -76,8 +69,19 @@ export default function TransactionsPage() {
       </div>
 
       <TransactionFilters filters={filters} onChange={handleFilterChange} onReset={handleReset} />
-      <TransactionList pagedData={pagedData} loading={loading} onPageChange={setPage} onDelete={() => fetchTransactions(page, filters)} />
-      <TransactionModal isOpen={modalOpen} onClose={() => { setModalOpen(false); fetchTransactions(page, filters); }} />
+      <TransactionList
+        pagedData={pagedData || null}
+        loading={loading}
+        onPageChange={setPage}
+        onDelete={refreshData}
+      />
+      <TransactionModal
+        isOpen={modalOpen}
+        onClose={() => {
+          setModalOpen(false);
+          refreshData();
+        }}
+      />
     </div>
   );
 }

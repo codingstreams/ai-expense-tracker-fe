@@ -9,16 +9,17 @@ import AccountsStep from "@/components/onboarding/AccountsStep";
 import CashStep from "@/components/onboarding/CashStep";
 
 import { useAuthStore } from "@/store/useAuthStore";
-import { onboardingService } from "@/service/onboarding.service";
+import { useOnboardUser } from "@/api/generated/dashboard-controller/dashboard-controller";
 import { OnboardingFormValues, onboardingSchema } from "@/validations/onboarding";
 import UserPreferences from "@/components/onboarding/UserPreferences";
 import UserGreetings from "@/components/dashboard/UserGreetings";
 
 export default function OnboardingPage() {
-  const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const router = useRouter();
   const auth = useAuthStore((state) => state.auth);
+
+  const { mutateAsync: onboardUserMutate, isPending: submitting } = useOnboardUser();
 
   useEffect(() => {
     if (auth?.onboarded) {
@@ -40,22 +41,27 @@ export default function OnboardingPage() {
 
   const onSubmit = async (data: OnboardingFormValues) => {
     try {
-      setSubmitting(true);
       setErrorMsg("");
-      await onboardingService.onboardUser({
-        userConfig: {
-          languagePreference: data.languagePreference,
-          spendLimit: data.spendLimit,
-          currency: data.currency,
-          paymentMode: data.paymentModeId,
-          isOnboardingComplete: true,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await onboardUserMutate({
+        data: {
+          userConfig: {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            languagePreference: data.languagePreference as any,
+            spendLimit: data.spendLimit,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            currency: data.currency as any,
+            paymentMode: data.paymentMode,
+            isOnboardingComplete: true,
+          },
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          accounts: (data.accounts || []).map((acc) => ({
+            ...acc,
+            isUpiEnabled: acc.isUpiEnabled ?? true,
+            isNetBankingEnabled: acc.isNetBankingEnabled ?? true,
+          })) as any,
+          cashBalance: data.cashBalance,
         },
-        accounts: (data.accounts || []).map((acc) => ({
-          ...acc,
-          isUpiEnabled: acc.isUpiEnabled ?? true,
-          isNetBankingEnabled: acc.isNetBankingEnabled ?? true,
-        })),
-        cashBalance: data.cashBalance,
       });
 
       const currentAuth = useAuthStore.getState().auth;
@@ -72,8 +78,6 @@ export default function OnboardingPage() {
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Failed to complete onboarding";
       setErrorMsg(msg);
-    } finally {
-      setSubmitting(false);
     }
   };
 

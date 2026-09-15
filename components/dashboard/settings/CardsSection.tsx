@@ -1,22 +1,40 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { CreditCard, Plus, Trash2, X, AlertCircle } from "lucide-react";
+import { useState } from "react";
+import { CreditCard, Plus, Trash2, X, AlertCircle, Loader2 } from "lucide-react";
 import { CardDto } from "@/types/transaction.dto";
 import { BankDto, AccountDto } from "@/types/onboarding.dto";
-import { accountService } from "@/service/account.service";
-import { apiClient } from "@/service/apiClient";
-
+import { customInstance } from "@/service/custom-instance";
+import {
+  useGetUserCards,
+  useAddCards,
+  getGetUserCardsQueryKey,
+} from "@/api/generated/card-controller/card-controller";
+import { useGetUserAccounts } from "@/api/generated/account-controller/account-controller";
+import { useGetBanks } from "@/api/generated/bank-controller/bank-controller";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function CardsSection() {
-  const [debitCards, setDebitCards] = useState<CardDto[]>([]);
-  const [creditCards, setCreditCards] = useState<CardDto[]>([]);
-  const [banks, setBanks] = useState<BankDto[]>([]);
-  const [accounts, setAccounts] = useState<AccountDto[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
-  const [saving, setSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+
+  const { data: debitCardsData, isLoading: debitLoading } = useGetUserCards({ type: "DEBIT_CARD" });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const debitCards: CardDto[] = (debitCardsData?.data?.cards || []) as any[];
+
+  const { data: creditCardsData, isLoading: creditLoading } = useGetUserCards({ type: "CREDIT_CARD" });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const creditCards: CardDto[] = (creditCardsData?.data?.cards || []) as any[];
+
+  const { data: accountsData } = useGetUserAccounts();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const accounts: AccountDto[] = ((accountsData?.data || []) as any[]).filter((a) => a.accountType !== "CASH");
+
+  const { data: banksData } = useGetBanks();
+  const banks: BankDto[] = (banksData?.data || []) as BankDto[];
+
+  const loading = debitLoading || creditLoading;
 
   const [cardForm, setCardForm] = useState({
     cardType: "DEBIT" as "DEBIT" | "CREDIT",
@@ -25,38 +43,6 @@ export default function CardsSection() {
     bankId: "",
     limit: "",
   });
-
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      const [debitRes, creditRes, accountsRes, banksRes] = await Promise.allSettled([
-        accountService.getDebitCards(),
-        accountService.getCreditCards(),
-        accountService.getUserAccounts(),
-        apiClient<BankDto[]>("/banks"),
-      ]);
-
-      setDebitCards(debitRes.status === "fulfilled" && debitRes.value ? debitRes.value : []);
-      setCreditCards(creditRes.status === "fulfilled" && creditRes.value ? creditRes.value : []);
-
-      const userAccounts = accountsRes.status === "fulfilled" && accountsRes.value ? accountsRes.value : [];
-      const nonCashAccounts = userAccounts.filter((a) => a.accountType !== "CASH");
-      setAccounts(nonCashAccounts);
-
-      setBanks(banksRes.status === "fulfilled" && banksRes.value ? banksRes.value : []);
-    } catch {
-      setDebitCards([]);
-      setCreditCards([]);
-      setAccounts([]);
-      setBanks([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadData();
-  }, []);
 
   const openModal = () => {
     setErrorMsg("");
@@ -71,14 +57,25 @@ export default function CardsSection() {
     setModalOpen(true);
   };
 
-  const handleDeleteCard = async (cardId: string, isCredit: boolean) => {
+  const { mutateAsync: addCardsMutate, isPending: saving } = useAddCards({
+    mutation: {
+      onSuccess: () => {
+        setModalOpen(false);
+        queryClient.invalidateQueries({ queryKey: getGetUserCardsQueryKey() });
+        queryClient.invalidateQueries({ queryKey: ["cards"] });
+      },
+      onError: (err: unknown) => {
+        const msg = err instanceof Error ? err.message : "Failed to add card";
+        setErrorMsg(msg);
+      },
+    },
+  });
+
+  const handleDeleteCard = async (cardId: string) => {
     try {
-      await accountService.deleteCard(cardId);
-      if (isCredit) {
-        setCreditCards((prev) => prev.filter((c) => c.id !== cardId));
-      } else {
-        setDebitCards((prev) => prev.filter((c) => c.id !== cardId));
-      }
+      await customInstance<void>(`/api/cards/${cardId}`, { method: "DELETE" });
+      queryClient.invalidateQueries({ queryKey: getGetUserCardsQueryKey() });
+      queryClient.invalidateQueries({ queryKey: ["cards"] });
     } catch (err) {
       console.error(err);
     }
@@ -92,150 +89,181 @@ export default function CardsSection() {
     }
 
     try {
-      setSaving(true);
       setErrorMsg("");
 
       if (cardForm.cardType === "DEBIT") {
         if (!cardForm.accountId) {
           setErrorMsg("Please select an account for debit card");
-          setSaving(false);
           return;
         }
 
-        await accountService.addCard({
-          cardType: "DEBIT_CARD",
-          lastFourDigits: cardForm.lastFourDigits,
-          accountId: cardForm.accountId,
+        await addCardsMutate({
+          data: {
+            cards: [
+              {
+                cardType: "DEBIT_CARD",
+                lastFourDigits: cardForm.lastFourDigits,
+                accountId: cardForm.accountId,
+              },
+            ],
+          },
         });
       } else {
         if (!cardForm.bankId) {
           setErrorMsg("Please select a bank for credit card");
-          setSaving(false);
           return;
         }
         if (!cardForm.limit || Number(cardForm.limit) <= 0) {
           setErrorMsg("Please enter a valid credit limit");
-          setSaving(false);
           return;
         }
 
         const selectedBank = banks.find((b) => b.id === cardForm.bankId);
         if (!selectedBank) {
           setErrorMsg("Selected bank not found");
-          setSaving(false);
           return;
         }
 
-        await accountService.addCard({
-          cardType: "CREDIT_CARD",
-          lastFourDigits: cardForm.lastFourDigits,
-          limit: Number(cardForm.limit),
-          bank: {
-            id: selectedBank.id,
-            name: selectedBank.name,
+        await addCardsMutate({
+          data: {
+            cards: [
+              {
+                cardType: "CREDIT_CARD",
+                lastFourDigits: cardForm.lastFourDigits,
+                limit: Number(cardForm.limit),
+                bank: {
+                  id: selectedBank.id,
+                  name: selectedBank.name,
+                },
+              },
+            ],
           },
         });
       }
-
-      setModalOpen(false);
-      await loadData();
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Failed to add card";
-      setErrorMsg(msg);
-    } finally {
-      setSaving(false);
+    } catch {
+      // Handled in onError
     }
   };
 
   const formatCurrency = (val: number) => {
-    return new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(val);
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0,
+    }).format(val);
   };
 
-  const allCards = [
-    ...debitCards.map((c) => ({ ...c, isCredit: false })),
-    ...creditCards.map((c) => ({ ...c, isCredit: true })),
-  ];
-
   return (
-    <div className="p-6 rounded-2xl border border-zinc-800 bg-zinc-900 shadow-2xl space-y-5">
+    <div className="p-6 rounded-2xl border border-zinc-800 bg-zinc-900 shadow-2xl space-y-6">
       <div className="flex items-center justify-between border-b border-zinc-800/80 pb-3">
         <div>
           <h2 className="text-lg font-bold text-white tracking-tight">Cards</h2>
-          <p className="text-xs text-zinc-400">Manage your debit and credit cards for quick transaction logging.</p>
+          <p className="text-xs text-zinc-400">Manage your debit and credit cards.</p>
         </div>
         <button
           type="button"
           onClick={openModal}
-          className="text-xs font-semibold px-3.5 py-2 rounded-xl bg-purple-600/20 text-purple-300 border border-purple-500/30 hover:bg-purple-600/30 transition-colors flex items-center gap-1.5"
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold shadow-md shadow-purple-900/30 transition-all"
         >
-          <Plus className="h-3.5 w-3.5" />
+          <Plus className="h-4 w-4" />
           <span>Add Card</span>
         </button>
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div className="h-24 bg-zinc-950/60 border border-zinc-800 rounded-xl animate-pulse" />
-          <div className="h-24 bg-zinc-950/60 border border-zinc-800 rounded-xl animate-pulse" />
-        </div>
-      ) : allCards.length === 0 ? (
-        <div className="text-center py-8 text-xs text-zinc-500 border border-dashed border-zinc-800 rounded-xl">
-          No cards added yet. Click &quot;+ Add Card&quot; to link your first card.
+        <div className="py-8 text-center text-xs text-zinc-500 flex justify-center items-center gap-2">
+          <Loader2 className="h-4 w-4 animate-spin text-purple-400" />
+          <span>Loading cards...</span>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {allCards.map((card) => {
-            const isCredit = card.isCredit || card.cardType?.toUpperCase() === "CREDIT";
-            return (
-              <div
-                key={card.id}
-                className="p-4 border border-zinc-800/80 rounded-xl bg-zinc-950/70 flex items-center justify-between gap-3 hover:bg-zinc-950 transition-colors group"
-              >
-                <div className="flex items-center gap-3 min-w-0">
+        <div className="space-y-6">
+          <div className="space-y-3">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">Debit Cards</h3>
+            {debitCards.length === 0 ? (
+              <p className="text-xs text-zinc-500 italic">No debit cards added.</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                {debitCards.map((card) => (
                   <div
-                    className={`p-2.5 rounded-xl border shrink-0 ${isCredit
-                      ? "bg-purple-500/10 border-purple-500/20 text-purple-400"
-                      : "bg-indigo-500/10 border-indigo-500/20 text-indigo-400"
-                      }`}
+                    key={card.id || card.lastFourDigits}
+                    className="p-4 rounded-xl border border-zinc-800 bg-zinc-950/60 hover:bg-zinc-950 transition-colors flex items-center justify-between gap-3 group"
                   >
-                    <CreditCard className="h-4 w-4" />
-                  </div>
-                  <div className="min-w-0 space-y-0.5">
-                    <div className="text-sm font-semibold text-white truncate">
-                      {card.bank?.name || (isCredit ? "Credit Card" : "Debit Card")}
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="p-2.5 rounded-xl border border-indigo-500/20 bg-indigo-500/10 text-indigo-400 shrink-0">
+                        <CreditCard className="h-5 w-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-sm font-semibold text-white truncate">
+                          {card.bank?.name || "Debit Card"}
+                        </div>
+                        <div className="text-[11px] text-zinc-400">
+                          •••• {card.lastFourDigits}
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-xs text-zinc-400 flex items-center gap-2 flex-wrap">
-                      <span className="font-mono text-zinc-300">•••• {card.lastFourDigits || "••••"}</span>
-                      <span>•</span>
-                      <span
-                        className={`text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded border ${isCredit
-                          ? "bg-purple-500/10 border-purple-500/20 text-purple-400"
-                          : "bg-indigo-500/10 border-indigo-500/20 text-indigo-400"
-                          }`}
-                      >
-                        {isCredit ? "Credit" : "Debit"}
-                      </span>
-                      {isCredit && typeof card.limit === "number" && (
-                        <>
-                          <span>•</span>
-                          <span className="text-[11px] text-zinc-400">Limit: {formatCurrency(card.limit)}</span>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </div>
 
-                <button
-                  type="button"
-                  onClick={() => handleDeleteCard(card.id, isCredit)}
-                  title="Delete Card"
-                  className="p-1.5 rounded-lg text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 opacity-70 group-hover:opacity-100 transition-all shrink-0"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteCard(card.id)}
+                      title="Remove card"
+                      className="p-1.5 rounded-lg text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 opacity-70 group-hover:opacity-100 transition-all"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
               </div>
-            );
-          })}
+            )}
+          </div>
+
+          <div className="space-y-3 pt-4 border-t border-zinc-800/60">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">Credit Cards</h3>
+            {creditCards.length === 0 ? (
+              <p className="text-xs text-zinc-500 italic">No credit cards added.</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                {creditCards.map((card) => (
+                  <div
+                    key={card.id || card.lastFourDigits}
+                    className="p-4 rounded-xl border border-zinc-800 bg-zinc-950/60 hover:bg-zinc-950 transition-colors flex items-center justify-between gap-3 group"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="p-2.5 rounded-xl border border-rose-500/20 bg-rose-500/10 text-rose-400 shrink-0">
+                        <CreditCard className="h-5 w-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-sm font-semibold text-white truncate">
+                          {card.bank?.name || "Credit Card"}
+                        </div>
+                        <div className="text-[11px] text-zinc-400">
+                          •••• {card.lastFourDigits}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 shrink-0">
+                      {card.limit !== undefined && card.limit !== null && (
+                        <div className="text-right">
+                          <div className="text-sm font-bold text-white">
+                            {formatCurrency(card.limit)}
+                          </div>
+                          <div className="text-[10px] text-zinc-500 uppercase">Limit</div>
+                        </div>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteCard(card.id)}
+                        title="Remove card"
+                        className="p-1.5 rounded-lg text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 opacity-70 group-hover:opacity-100 transition-all"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
 
@@ -243,7 +271,7 @@ export default function CardsSection() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
           <div className="w-full max-w-md rounded-2xl border border-zinc-800 bg-zinc-900 p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
-              <h2 className="text-base font-bold text-white tracking-tight">Add New Card</h2>
+              <h3 className="text-sm font-bold text-white tracking-tight">Add New Card</h3>
               <button
                 type="button"
                 onClick={() => setModalOpen(false)}
@@ -260,50 +288,31 @@ export default function CardsSection() {
               </div>
             )}
 
-            <form onSubmit={handleAddCard} className="space-y-3.5">
-              <div>
-                <label className="block text-[11px] font-medium uppercase tracking-wider text-zinc-400 mb-1">
-                  Card Type
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    disabled={accounts.length === 0}
-                    onClick={() =>
-                      setCardForm({
-                        ...cardForm,
-                        cardType: "DEBIT",
-                        accountId: cardForm.accountId || accounts[0]?.id || "",
-                      })
-                    }
-                    className={`py-2 text-xs font-semibold rounded-xl border transition-all ${cardForm.cardType === "DEBIT"
-                      ? "border-indigo-500 bg-indigo-500/10 text-indigo-400"
-                      : "border-zinc-800 bg-zinc-950 text-zinc-400 hover:text-zinc-200"
-                      } disabled:opacity-40 disabled:cursor-not-allowed`}
-                    title={accounts.length === 0 ? "No bank accounts available. Add a bank account first" : ""}
-                  >
-                    Debit Card
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setCardForm({
-                        ...cardForm,
-                        cardType: "CREDIT",
-                        bankId: cardForm.bankId || banks[0]?.id || "",
-                      })
-                    }
-                    className={`py-2 text-xs font-semibold rounded-xl border transition-all ${cardForm.cardType === "CREDIT"
-                      ? "border-purple-500 bg-purple-500/10 text-purple-400"
-                      : "border-zinc-800 bg-zinc-950 text-zinc-400 hover:text-zinc-200"
-                      }`}
-                  >
-                    Credit Card
-                  </button>
-                </div>
-                {accounts.length === 0 && cardForm.cardType === "DEBIT" && (
-                  <p className="text-[11px] text-amber-400 mt-1">No bank accounts linked. Add a bank account to enable Debit Card.</p>
-                )}
+            <form onSubmit={handleAddCard} className="space-y-4 text-xs">
+              <div className="flex rounded-xl bg-zinc-950 p-1 border border-zinc-800">
+                <button
+                  type="button"
+                  onClick={() => setCardForm({ ...cardForm, cardType: "DEBIT" })}
+                  disabled={accounts.length === 0}
+                  className={`flex-1 py-1.5 rounded-lg font-semibold transition-all ${
+                    cardForm.cardType === "DEBIT"
+                      ? "bg-purple-600 text-white shadow-sm"
+                      : "text-zinc-400 hover:text-white"
+                  } disabled:opacity-30`}
+                >
+                  Debit Card
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCardForm({ ...cardForm, cardType: "CREDIT" })}
+                  className={`flex-1 py-1.5 rounded-lg font-semibold transition-all ${
+                    cardForm.cardType === "CREDIT"
+                      ? "bg-purple-600 text-white shadow-sm"
+                      : "text-zinc-400 hover:text-white"
+                  }`}
+                >
+                  Credit Card
+                </button>
               </div>
 
               {cardForm.cardType === "DEBIT" ? (
@@ -314,26 +323,26 @@ export default function CardsSection() {
                   <select
                     value={cardForm.accountId}
                     onChange={(e) => setCardForm({ ...cardForm, accountId: e.target.value })}
-                    className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3.5 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                    className="w-full rounded-xl border border-zinc-800 bg-zinc-950 py-2.5 px-3 text-zinc-100 focus:border-purple-500 focus:outline-none"
                   >
-                    <option value="">Select Bank Account</option>
+                    <option value="">Select Account</option>
                     {accounts.map((acc) => (
                       <option key={acc.id} value={acc.id}>
-                        {acc.bank?.name || "Account"} (••{acc.lastFourDigits}) - {formatCurrency(acc.balance)}
+                        {acc.bank?.name || "Bank Account"} (•••• {acc.lastFourDigits})
                       </option>
                     ))}
                   </select>
                 </div>
               ) : (
-                <>
+                <div className="space-y-3">
                   <div>
                     <label className="block text-[11px] font-medium uppercase tracking-wider text-zinc-400 mb-1">
-                      Bank
+                      Card Issuer Bank
                     </label>
                     <select
                       value={cardForm.bankId}
                       onChange={(e) => setCardForm({ ...cardForm, bankId: e.target.value })}
-                      className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3.5 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                      className="w-full rounded-xl border border-zinc-800 bg-zinc-950 py-2.5 px-3 text-zinc-100 focus:border-purple-500 focus:outline-none"
                     >
                       <option value="">Select Bank</option>
                       {banks.map((b) => (
@@ -343,21 +352,19 @@ export default function CardsSection() {
                       ))}
                     </select>
                   </div>
-
                   <div>
                     <label className="block text-[11px] font-medium uppercase tracking-wider text-zinc-400 mb-1">
-                      Credit Limit
+                      Credit Limit (₹)
                     </label>
                     <input
                       type="number"
-                      min={0}
                       value={cardForm.limit}
                       onChange={(e) => setCardForm({ ...cardForm, limit: e.target.value })}
-                      placeholder="e.g. 50000"
-                      className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3.5 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                      placeholder="e.g. 100000"
+                      className="w-full rounded-xl border border-zinc-800 bg-zinc-950 py-2.5 px-3 text-zinc-100 focus:border-purple-500 focus:outline-none font-mono"
                     />
                   </div>
-                </>
+                </div>
               )}
 
               <div>
@@ -368,26 +375,28 @@ export default function CardsSection() {
                   type="text"
                   maxLength={4}
                   value={cardForm.lastFourDigits}
-                  onChange={(e) => setCardForm({ ...cardForm, lastFourDigits: e.target.value.replace(/\D/g, "") })}
-                  placeholder="e.g. 4242"
-                  className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3.5 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500 font-mono tracking-widest"
+                  onChange={(e) =>
+                    setCardForm({ ...cardForm, lastFourDigits: e.target.value.replace(/[^0-9]/g, "") })
+                  }
+                  placeholder="1234"
+                  className="w-full rounded-xl border border-zinc-800 bg-zinc-950 py-2.5 px-3 text-zinc-100 focus:border-purple-500 focus:outline-none font-mono"
                 />
               </div>
 
-              <div className="flex gap-3 pt-2">
+              <div className="flex gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="flex-1 rounded-xl border border-zinc-800 bg-zinc-950 py-2.5 text-xs font-semibold text-zinc-400 hover:text-white transition-colors"
+                  className="flex-1 py-2.5 rounded-xl border border-zinc-800 hover:bg-zinc-800 text-zinc-300 font-semibold transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex-1 rounded-xl bg-purple-600 hover:bg-purple-500 py-2.5 text-xs font-semibold text-white transition-colors shadow-lg shadow-purple-950/50 disabled:opacity-50"
+                  className="flex-1 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold shadow-lg shadow-purple-900/40 transition-all disabled:opacity-50"
                 >
-                  {saving ? "Saving..." : "Add Card"}
+                  {saving ? "Saving..." : "Save Card"}
                 </button>
               </div>
             </form>

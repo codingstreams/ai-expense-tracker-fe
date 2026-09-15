@@ -1,47 +1,54 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Check, AlertCircle, Save } from "lucide-react";
+import { useState } from "react";
+import { Check, AlertCircle, Save, Loader2 } from "lucide-react";
 import { useDashboardStore } from "@/store/useDashboardStore";
-import { accountService } from "@/service/account.service";
+import {
+  useGetUserCashAccountDetails,
+  useUpdateCashBalance,
+  getGetUserCashAccountDetailsQueryKey,
+} from "@/api/generated/account-controller/account-controller";
+import { getGetSummaryQueryKey } from "@/api/generated/dashboard-controller/dashboard-controller";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function CashSection() {
-  const [balance, setBalance] = useState<number>(0);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const queryClient = useQueryClient();
+  const [userBalance, setUserBalance] = useState<number | null>(null);
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
-  useEffect(() => {
-    accountService
-      .getCashAccount()
-      .then((data) => {
-        if (data && typeof data.balance === "number") {
-          setBalance(data.balance);
-        }
-      })
-      .catch(() => { })
-      .finally(() => setLoading(false));
-  }, []);
+  const { data: cashResponse, isLoading: loading } = useGetUserCashAccountDetails();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const serverBalance = Number((cashResponse?.data as any)?.balance ?? 0);
+  const displayBalance = userBalance !== null ? userBalance : serverBalance;
+
+  const { mutateAsync: updateCashMutate, isPending: saving } = useUpdateCashBalance({
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: getGetUserCashAccountDetailsQueryKey() });
+        queryClient.invalidateQueries({ queryKey: getGetSummaryQueryKey() });
+        useDashboardStore.getState().triggerRefresh();
+        setSuccessMsg("Cash balance updated!");
+        setTimeout(() => setSuccessMsg(""), 3500);
+      },
+      onError: (err: unknown) => {
+        const msg = err instanceof Error ? err.message : "Failed to update cash balance";
+        setErrorMsg(msg);
+        setTimeout(() => setErrorMsg(""), 3500);
+      },
+    },
+  });
 
   const handleUpdate = async (e: React.SubmitEvent) => {
     e.preventDefault();
+    setErrorMsg("");
+    setSuccessMsg("");
     try {
-      setSaving(true);
-      setErrorMsg("");
-      setSuccessMsg("");
-
-      await accountService.updateCashBalance(Number(balance));
-      useDashboardStore.getState().triggerRefresh();
-
-      setSuccessMsg("Cash balance updated!");
-      setTimeout(() => setSuccessMsg(""), 3500);
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Failed to update cash balance";
-      setErrorMsg(msg);
-    } finally {
-      setSaving(false);
-    }
+      await updateCashMutate({
+        data: { cashBalance: displayBalance },
+      });
+      setUserBalance(null);
+    } catch {}
   };
 
   return (
@@ -68,7 +75,9 @@ export default function CashSection() {
       )}
 
       {loading ? (
-        <div className="h-12 bg-zinc-950/60 border border-zinc-800 rounded-xl animate-pulse" />
+        <div className="h-12 bg-zinc-950/60 border border-zinc-800 rounded-xl animate-pulse flex items-center justify-center">
+          <Loader2 className="h-4 w-4 animate-spin text-purple-400" />
+        </div>
       ) : (
         <form onSubmit={handleUpdate} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex-1 max-w-sm">
@@ -82,10 +91,10 @@ export default function CashSection() {
               <input
                 type="number"
                 min={0}
-                value={balance}
-                onChange={(e) => setBalance(Number(e.target.value))}
+                value={displayBalance}
+                onChange={(e) => setUserBalance(Number(e.target.value))}
                 placeholder="0"
-                className="w-full rounded-xl border border-zinc-800 bg-zinc-950 pl-20 pr-3.5 py-2 text-sm text-zinc-100 placeholder-zinc-600 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500 font-medium"
+                className="w-full rounded-xl border border-zinc-800 bg-zinc-950 pl-20 pr-3.5 py-2 text-sm text-zinc-100 placeholder-zinc-600 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500 font-medium font-mono"
               />
             </div>
           </div>
@@ -96,7 +105,7 @@ export default function CashSection() {
               disabled={saving}
               className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold shadow-md shadow-purple-950/30 transition-all disabled:opacity-50 w-full sm:w-auto"
             >
-              <Save className="h-3.5 w-3.5" />
+              {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
               <span>{saving ? "Updating..." : "Update Cash"}</span>
             </button>
           </div>

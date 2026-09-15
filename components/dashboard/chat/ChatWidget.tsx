@@ -2,29 +2,35 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Sparkles, X, Send, Bot, RotateCcw, Loader2 } from "lucide-react";
-import { chatService } from "@/service/chat.service";
+import { useChat, useClearChat } from "@/api/generated/ai-controller/ai-controller";
 
 interface Message {
   role: "user" | "ai";
   text: string;
 }
 
+const getInitialSessionId = (): string => {
+  if (typeof window === "undefined") return "";
+  const savedSession = localStorage.getItem("spendai_chat_session_id");
+  if (savedSession) return savedSession;
+  const newId = typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `session_${Date.now()}`;
+  try {
+    localStorage.setItem("spendai_chat_session_id", newId);
+  } catch {}
+  return newId;
+};
+
 export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
-  const [sessionId, setSessionId] = useState<string>("");
+  const [sessionId, setSessionId] = useState<string>(getInitialSessionId);
   const [messages, setMessages] = useState<Message[]>([
     { role: "ai", text: "Hi! Ask me anything about your expenses, budgets, or spending trends." }
   ]);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const savedSession = localStorage.getItem("spendai_chat_session_id");
-    const initialSession = savedSession || (typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `session_${Date.now()}`);
-    setSessionId(initialSession);
-  }, []);
+  const { mutateAsync: chatMutate, isPending: isTyping } = useChat();
+  const { mutateAsync: clearChatMutate } = useClearChat();
 
   useEffect(() => {
     if (isOpen) {
@@ -46,10 +52,18 @@ export default function ChatWidget() {
     } catch { }
   };
 
-  const handleResetSession = () => {
+  const handleResetSession = async () => {
+    try {
+      if (sessionId) {
+        await clearChatMutate();
+      }
+    } catch {}
+
     const newSession = typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `session_${Date.now()}`;
     setSessionId(newSession);
-    localStorage.setItem("spendai_chat_session_id", newSession);
+    try {
+      localStorage.setItem("spendai_chat_session_id", newSession);
+    } catch {}
     setMessages([
       { role: "ai", text: "Started a fresh session! What would you like to know about your finances?" }
     ]);
@@ -62,23 +76,27 @@ export default function ChatWidget() {
     setInput("");
     setMessages((prev) => [...prev, { role: "user", text: query }]);
     playBubbleSound();
-    setIsTyping(true);
 
     try {
-      const activeSession = sessionId || `session_${Date.now()}`;
-      const res = await chatService.chat({
-        message: query,
-        sessionId: activeSession,
+      const activeSession = sessionId || getInitialSessionId();
+      const res = await chatMutate({
+        data: {
+          message: query,
+          sessionId: activeSession,
+        },
       });
 
-      if (res?.sessionId) {
-        setSessionId(res.sessionId);
-        localStorage.setItem("spendai_chat_session_id", res.sessionId);
+      const replyData = res.data;
+      if (replyData?.sessionId) {
+        setSessionId(replyData.sessionId);
+        try {
+          localStorage.setItem("spendai_chat_session_id", replyData.sessionId);
+        } catch {}
       }
 
       setMessages((prev) => [
         ...prev,
-        { role: "ai", text: res?.reply || "I couldn't generate a response." }
+        { role: "ai", text: replyData?.reply || "I couldn't generate a response." }
       ]);
       playBubbleSound();
     } catch {
@@ -87,8 +105,6 @@ export default function ChatWidget() {
         { role: "ai", text: "Sorry, I ran into an issue connecting to the chat service. Please try again." }
       ]);
       playBubbleSound();
-    } finally {
-      setIsTyping(false);
     }
   };
 
@@ -140,10 +156,11 @@ export default function ChatWidget() {
             {messages.map((m, idx) => (
               <div key={idx} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
                 <div
-                  className={`max-w-[85%] p-2.5 rounded-xl whitespace-pre-wrap leading-relaxed ${m.role === "user"
-                    ? "bg-purple-600 text-white"
-                    : "bg-zinc-950 border border-zinc-800 text-zinc-200"
-                    }`}
+                  className={`max-w-[85%] p-2.5 rounded-xl whitespace-pre-wrap leading-relaxed ${
+                    m.role === "user"
+                      ? "bg-purple-600 text-white"
+                      : "bg-zinc-950 border border-zinc-800 text-zinc-200"
+                  }`}
                 >
                   {m.text}
                 </div>

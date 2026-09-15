@@ -5,6 +5,7 @@ import { authService } from "@/service/auth.service";
 import { useAuthStore } from "@/store/useAuthStore";
 import { LoginFormValues, loginSchema } from "@/validations/auth";
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
 import { AlertCircle, Mail, Loader2, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -18,19 +19,23 @@ export default function LoginForm() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: IS_PROD ? "" : "akshay@codingstreams.in",
-      password: IS_PROD ? "" : "test@1234"
-    }
+      password: IS_PROD ? "" : "test@1234",
+    },
+  });
+
+  const { mutateAsync: loginMutate, isPending } = useMutation({
+    mutationFn: (data: LoginFormValues) => authService.login(data),
   });
 
   const onSubmit = async (data: LoginFormValues) => {
     try {
       setErrorMsg('');
-      const { auth, user } = await authService.login(data);
+      const { auth, user } = await loginMutate(data);
       setAuth(auth, user);
 
       router.push(user.isOnboardingComplete ? '/dashboard' : '/onboarding');
@@ -97,10 +102,10 @@ export default function LoginForm() {
 
         <button
           type="submit"
-          disabled={isSubmitting}
+          disabled={isPending}
           className="w-full rounded-xl bg-purple-600 py-3 text-sm font-semibold text-white transition hover:bg-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-zinc-900 disabled:opacity-50 shadow-lg shadow-purple-950/50"
         >
-          {isSubmitting ? <Loader2 className="mx-auto h-4 w-4 animate-spin" /> : 'Sign In'}
+          {isPending ? <Loader2 className="mx-auto h-4 w-4 animate-spin" /> : 'Sign In'}
         </button>
       </form>
     </div>

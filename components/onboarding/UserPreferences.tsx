@@ -1,31 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { OnboardingFormValues } from "@/validations/onboarding";
-import { onboardingService } from "@/service/onboarding.service";
-import { PaymentModeDto } from "@/types/transaction.dto";
+import { useGetLanguagePreferences } from "@/api/generated/dashboard-controller/dashboard-controller";
+import { useGetPaymentModes } from "@/api/generated/payment-mode-controller/payment-mode-controller";
 
 export default function UserPreferences() {
   const { register, formState: { errors } } = useFormContext<OnboardingFormValues>();
-  const [languages, setLanguages] = useState<string[]>(["EN", "HI", "ES", "FR"]);
-  const [payementModes, setPaymentModes] = useState<PaymentModeDto[]>([]);
+  
+  const { data: langData } = useGetLanguagePreferences();
+  const { data: paymentModesData } = useGetPaymentModes();
 
-  useEffect(() => {
-    onboardingService
-      .getSupportedLanguagePreferences()
-      .then((res) => {
-        if (res?.options?.length) setLanguages(res.options);
-      })
-      .catch(() => { });
-
-    onboardingService
-      .getSupportedPaymentModes()
-      .then((res) => {
-        if (res?.length) setPaymentModes(res);
-      })
-      .catch(() => { });
-  }, []);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const languages: string[] = (langData?.data as any)?.options || ["EN", "HI", "ES", "FR"];
+  const paymentModes = paymentModesData?.data || [];
 
   return (
     <div className="p-6 rounded-2xl border border-zinc-800 bg-zinc-900 shadow-2xl space-y-5">
@@ -77,7 +65,7 @@ export default function UserPreferences() {
             className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3.5 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
           >
             <option value="">Select Mode</option>
-            {payementModes.map((pm, idx) => {
+            {paymentModes.map((pm, idx) => {
               return <option key={idx} value={pm.name}>{pm.name}</option>
             })}
             {/* <option value="">Select Mode</option>
