@@ -1,39 +1,31 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {
+  useGetLatestInsight,
+  useGenerateInsights,
+  getGetLatestInsightQueryKey,
+} from "@/api/generated/ai-controller/ai-controller";
+import { useQueryClient } from "@tanstack/react-query";
 import { Sparkles, AlertTriangle, Lightbulb, TrendingUp, RefreshCw } from "lucide-react";
-import { analyticsService } from "@/services/analytics.service";
-import { AiInsightDto } from "@/types/analytics.dto";
 
 export default function AiInsights() {
-  const [insight, setInsight] = useState<AiInsightDto | null>(null);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const { data: response, isLoading } = useGetLatestInsight();
+  const insight = response?.data;
 
-  const fetchInsights = () => {
-    setLoading(true);
-    analyticsService
-      .getAiInsights()
-      .then((data) => {
-        if (data) setInsight(data);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  };
+  const { mutate: generateInsightsMutate, isPending: isGenerating } = useGenerateInsights({
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: getGetLatestInsightQueryKey() });
+      },
+    },
+  });
+
+  const loading = isLoading || isGenerating;
 
   const handleGenerate = () => {
-    setLoading(true);
-    analyticsService
-      .generateAiInsights()
-      .then((data) => {
-        if (data) setInsight(data);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    generateInsightsMutate();
   };
-
-  useEffect(() => {
-    fetchInsights();
-  }, []);
 
   return (
     <div className="p-5 rounded-2xl border border-zinc-800 bg-zinc-900 shadow-xl space-y-5">
@@ -95,7 +87,7 @@ export default function AiInsights() {
                     <TrendingUp className="h-3.5 w-3.5 text-rose-400" />
                     <span>Top Spending</span>
                   </div>
-                  {insight.topSpendingCategory.percentage !== null && (
+                  {insight.topSpendingCategory.percentage !== undefined && insight.topSpendingCategory.percentage !== null && (
                     <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-rose-500/10 border border-rose-500/20 text-rose-400">
                       {insight.topSpendingCategory.percentage.toFixed(2)}%
                     </span>

@@ -5,19 +5,21 @@ import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import LogoutButton from "@/components/auth/LogoutButton";
-import UserGreetings from "@/components/dashboard/UserGreetings";
 import AccountsStep from "@/components/onboarding/AccountsStep";
 import CashStep from "@/components/onboarding/CashStep";
-import PreferencesStep from "@/components/onboarding/PreferencesStep";
-import { onboardingService } from "@/services/onboarding.service";
-import { OnboardingFormValues, onboardingSchema } from "@/lib/validations/onboarding";
+
 import { useAuthStore } from "@/store/useAuthStore";
+import { useOnboardUser } from "@/api/generated/dashboard-controller/dashboard-controller";
+import { OnboardingFormValues, onboardingSchema } from "@/validations/onboarding";
+import UserPreferences from "@/components/onboarding/UserPreferences";
+import UserGreetings from "@/components/dashboard/UserGreetings";
 
 export default function OnboardingPage() {
-  const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const router = useRouter();
   const auth = useAuthStore((state) => state.auth);
+
+  const { mutateAsync: onboardUserMutate, isPending: submitting } = useOnboardUser();
 
   useEffect(() => {
     if (auth?.onboarded) {
@@ -39,22 +41,27 @@ export default function OnboardingPage() {
 
   const onSubmit = async (data: OnboardingFormValues) => {
     try {
-      setSubmitting(true);
       setErrorMsg("");
-      await onboardingService.onboardUser({
-        userConfig: {
-          languagePreference: data.languagePreference,
-          spendLimit: data.spendLimit,
-          currency: data.currency,
-          paymentMode: data.paymentModeId,
-          isOnboardingComplete: true,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await onboardUserMutate({
+        data: {
+          userConfig: {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            languagePreference: data.languagePreference as any,
+            spendLimit: data.spendLimit,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            currency: data.currency as any,
+            paymentMode: data.paymentModeId,
+            isOnboardingComplete: true,
+          },
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          accounts: (data.accounts || []).map((acc) => ({
+            ...acc,
+            isUpiEnabled: acc.isUpiEnabled ?? true,
+            isNetBankingEnabled: acc.isNetBankingEnabled ?? true,
+          })) as any,
+          cashBalance: data.cashBalance,
         },
-        accounts: (data.accounts || []).map((acc) => ({
-          ...acc,
-          isUpiEnabled: acc.isUpiEnabled ?? true,
-          isNetBankingEnabled: acc.isNetBankingEnabled ?? true,
-        })),
-        cashBalance: data.cashBalance,
       });
 
       const currentAuth = useAuthStore.getState().auth;
@@ -71,8 +78,6 @@ export default function OnboardingPage() {
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Failed to complete onboarding";
       setErrorMsg(msg);
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -86,7 +91,7 @@ export default function OnboardingPage() {
 
         <FormProvider {...methods}>
           <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-6">
-            <PreferencesStep />
+            <UserPreferences />
             <CashStep />
             <AccountsStep />
 

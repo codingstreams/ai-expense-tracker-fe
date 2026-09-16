@@ -1,8 +1,9 @@
 "use client";
 
-import Summary from "@/components/dashboard/Summary";
-import MonthlyTrend from "@/components/dashboard/MonthlyTrend";
-import AiInsights from "@/components/dashboard/AiInsights";
+import AiInsights from "@/components/dashboard/analytics/AiInsights";
+import MonthlyTrend from "@/components/dashboard/MontlyTrend";
+import UserSummary from "@/components/dashboard/UserSummary";
+
 
 export default function AnalyticsPage() {
   return (
@@ -12,7 +13,7 @@ export default function AnalyticsPage() {
         <p className="text-xs text-zinc-400">Financial overview, 6-month trends, and AI-powered recommendations</p>
       </div>
 
-      <Summary />
+      <UserSummary />
 
       <MonthlyTrend variant="detailed" />
 
