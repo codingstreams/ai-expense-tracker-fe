@@ -37,8 +37,6 @@ export default function QuickInputBar() {
 
   const { mutateAsync: parseRawTextMutate } = useParseRawText();
 
-  const { mutateAsync: parseRawTextMutate } = useParseRawText();
-
   useEffect(() => {
     return () => {
       if (unsubscribeRef.current) {

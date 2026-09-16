@@ -78,7 +78,7 @@ export const getOnboardUserUrl = () => {
 
 export const onboardUser = async (onboardUserDto: OnboardUserDto, options?: Parameters<typeof customInstance>[1]): Promise<onboardUserResponse> => {
 
-  const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
     if (h instanceof Headers) return Object.fromEntries(h.entries());
     if (Symbol.iterator in h) {
@@ -92,15 +92,14 @@ export const onboardUser = async (onboardUserDto: OnboardUserDto, options?: Para
     }
     return headers;
   };
-  return customInstance<onboardUserResponse>(getOnboardUserUrl(),
-    {
-      ...options,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-      body: JSON.stringify(onboardUserDto)
-    }
-  );
-}
+return customInstance<onboardUserResponse>(getOnboardUserUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(onboardUserDto)
+  }
+);}
 
 
 
@@ -109,49 +108,48 @@ export const onboardUser = async (onboardUserDto: OnboardUserDto, options?: Para
 export const getOnboardUserMutationKey = () => ['onboardUser'] as const;
 
 export const getOnboardUserMutationOptions = <TError = unknown,
-  TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof onboardUser>>, TError, OnboardUserMutationVariables, TContext>, request?: SecondParameter<typeof customInstance> }
-  ): UseMutationOptions<Awaited<ReturnType<typeof onboardUser>>, TError, OnboardUserMutationVariables, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof onboardUser>>, TError,OnboardUserMutationVariables, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof onboardUser>>, TError,OnboardUserMutationVariables, TContext> => {
 
-  const mutationKey = getOnboardUserMutationKey();
-  const { mutation: mutationOptions, request: requestOptions } = options ?
-    options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+const mutationKey = getOnboardUserMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey, }, request: undefined };
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
 
 
 
 
-  const mutationFn: MutationFunction<Awaited<ReturnType<typeof onboardUser>>, OnboardUserMutationVariables> = (props) => {
-    const { data } = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof onboardUser>>, OnboardUserMutationVariables> = (props) => {
+          const {data} = props ?? {};
 
-    return onboardUser(data, requestOptions)
-  }
-
-
+          return  onboardUser(data,requestOptions)
+        }
 
 
 
 
-  return { mutationFn, ...mutationOptions }
-}
 
-export type OnboardUserMutationResult = NonNullable<Awaited<ReturnType<typeof onboardUser>>>
-export type OnboardUserMutationBody = OnboardUserDto
-export type OnboardUserMutationError = unknown
-export type OnboardUserMutationVariables = { data: OnboardUserDto }
 
-export const useOnboardUser = <TError = unknown,
-  TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof onboardUser>>, TError, OnboardUserMutationVariables, TContext>, request?: SecondParameter<typeof customInstance> }
-    , queryClient?: QueryClient): UseMutationResult<
-      Awaited<ReturnType<typeof onboardUser>>,
-      TError,
-      OnboardUserMutationVariables,
-      TContext
-    > => {
-  return useMutation(getOnboardUserMutationOptions(options), queryClient);
-}
-export type getSummaryResponse200 = {
+  return  { mutationFn, ...mutationOptions }}
+
+    export type OnboardUserMutationResult = NonNullable<Awaited<ReturnType<typeof onboardUser>>>
+    export type OnboardUserMutationBody = OnboardUserDto
+    export type OnboardUserMutationError = unknown
+    export type OnboardUserMutationVariables = {data: OnboardUserDto}
+
+    export const useOnboardUser = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof onboardUser>>, TError,OnboardUserMutationVariables, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof onboardUser>>,
+        TError,
+        OnboardUserMutationVariables,
+        TContext
+      > => {
+      return useMutation(getOnboardUserMutationOptions(options), queryClient);
+    }
+    export type getSummaryResponse200 = {
   data: UserSummaryDto
   status: 200
 }
@@ -171,45 +169,44 @@ export const getGetSummaryUrl = () => {
   return `/api/dashboard/summary`
 }
 
-export const getSummary = async (options?: Parameters<typeof customInstance>[1]): Promise<getSummaryResponse> => {
+export const getSummary = async ( options?: Parameters<typeof customInstance>[1]): Promise<getSummaryResponse> => {
 
   return customInstance<getSummaryResponse>(getGetSummaryUrl(),
-    {
-      ...options,
-      method: 'GET'
+  {
+    ...options,
+    method: 'GET'
 
 
-    }
-  );
-}
+  }
+);}
 
 
 
 
 
 export const getGetSummaryQueryKey = () => {
-  return [
+    return [
     `/api/dashboard/summary`
-  ] as const;
-}
+    ] as const;
+    }
 
 
-export const getGetSummaryQueryOptions = <TData = Awaited<ReturnType<typeof getSummary>>, TError = unknown>(options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSummary>>, TError, TData>>, request?: SecondParameter<typeof customInstance> }
+export const getGetSummaryQueryOptions = <TData = Awaited<ReturnType<typeof getSummary>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSummary>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
-  const { query: queryOptions, request: requestOptions } = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetSummaryQueryKey();
-
-
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getSummary>>> = ({ signal }) => getSummary({ signal, ...requestOptions });
+  const queryKey =  queryOptions?.queryKey ?? getGetSummaryQueryKey();
 
 
 
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSummary>>> = ({ signal }) => getSummary({ signal, ...requestOptions });
 
 
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof getSummary>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSummary>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
 export type GetSummaryQueryResult = NonNullable<Awaited<ReturnType<typeof getSummary>>>
@@ -217,42 +214,38 @@ export type GetSummaryQueryError = unknown
 
 
 export function useGetSummary<TData = Awaited<ReturnType<typeof getSummary>>, TError = unknown>(
-  options: {
-    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSummary>>, TError, TData>> & Pick<
-      DefinedInitialDataOptions<
-        Awaited<ReturnType<typeof getSummary>>,
-        TError,
-        Awaited<ReturnType<typeof getSummary>>
-      >, 'initialData'
-    >, request?: SecondParameter<typeof customInstance>
-  }
-  , queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSummary>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSummary>>,
+          TError,
+          Awaited<ReturnType<typeof getSummary>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetSummary<TData = Awaited<ReturnType<typeof getSummary>>, TError = unknown>(
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSummary>>, TError, TData>> & Pick<
-      UndefinedInitialDataOptions<
-        Awaited<ReturnType<typeof getSummary>>,
-        TError,
-        Awaited<ReturnType<typeof getSummary>>
-      >, 'initialData'
-    >, request?: SecondParameter<typeof customInstance>
-  }
-  , queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSummary>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSummary>>,
+          TError,
+          Awaited<ReturnType<typeof getSummary>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetSummary<TData = Awaited<ReturnType<typeof getSummary>>, TError = unknown>(
-  options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSummary>>, TError, TData>>, request?: SecondParameter<typeof customInstance> }
-  , queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSummary>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useGetSummary<TData = Awaited<ReturnType<typeof getSummary>>, TError = unknown>(
-  options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSummary>>, TError, TData>>, request?: SecondParameter<typeof customInstance> }
-  , queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSummary>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetSummaryQueryOptions(options)
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
@@ -282,45 +275,44 @@ export const getGetDashboardOverviewUrl = () => {
   return `/api/dashboard/overview`
 }
 
-export const getDashboardOverview = async (options?: Parameters<typeof customInstance>[1]): Promise<getDashboardOverviewResponse> => {
+export const getDashboardOverview = async ( options?: Parameters<typeof customInstance>[1]): Promise<getDashboardOverviewResponse> => {
 
   return customInstance<getDashboardOverviewResponse>(getGetDashboardOverviewUrl(),
-    {
-      ...options,
-      method: 'GET'
+  {
+    ...options,
+    method: 'GET'
 
 
-    }
-  );
-}
+  }
+);}
 
 
 
 
 
 export const getGetDashboardOverviewQueryKey = () => {
-  return [
+    return [
     `/api/dashboard/overview`
-  ] as const;
-}
+    ] as const;
+    }
 
 
-export const getGetDashboardOverviewQueryOptions = <TData = Awaited<ReturnType<typeof getDashboardOverview>>, TError = unknown>(options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getDashboardOverview>>, TError, TData>>, request?: SecondParameter<typeof customInstance> }
+export const getGetDashboardOverviewQueryOptions = <TData = Awaited<ReturnType<typeof getDashboardOverview>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDashboardOverview>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
-  const { query: queryOptions, request: requestOptions } = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetDashboardOverviewQueryKey();
-
-
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getDashboardOverview>>> = ({ signal }) => getDashboardOverview({ signal, ...requestOptions });
+  const queryKey =  queryOptions?.queryKey ?? getGetDashboardOverviewQueryKey();
 
 
 
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDashboardOverview>>> = ({ signal }) => getDashboardOverview({ signal, ...requestOptions });
 
 
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof getDashboardOverview>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getDashboardOverview>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
 export type GetDashboardOverviewQueryResult = NonNullable<Awaited<ReturnType<typeof getDashboardOverview>>>
@@ -328,42 +320,38 @@ export type GetDashboardOverviewQueryError = unknown
 
 
 export function useGetDashboardOverview<TData = Awaited<ReturnType<typeof getDashboardOverview>>, TError = unknown>(
-  options: {
-    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getDashboardOverview>>, TError, TData>> & Pick<
-      DefinedInitialDataOptions<
-        Awaited<ReturnType<typeof getDashboardOverview>>,
-        TError,
-        Awaited<ReturnType<typeof getDashboardOverview>>
-      >, 'initialData'
-    >, request?: SecondParameter<typeof customInstance>
-  }
-  , queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDashboardOverview>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getDashboardOverview>>,
+          TError,
+          Awaited<ReturnType<typeof getDashboardOverview>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetDashboardOverview<TData = Awaited<ReturnType<typeof getDashboardOverview>>, TError = unknown>(
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getDashboardOverview>>, TError, TData>> & Pick<
-      UndefinedInitialDataOptions<
-        Awaited<ReturnType<typeof getDashboardOverview>>,
-        TError,
-        Awaited<ReturnType<typeof getDashboardOverview>>
-      >, 'initialData'
-    >, request?: SecondParameter<typeof customInstance>
-  }
-  , queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDashboardOverview>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getDashboardOverview>>,
+          TError,
+          Awaited<ReturnType<typeof getDashboardOverview>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetDashboardOverview<TData = Awaited<ReturnType<typeof getDashboardOverview>>, TError = unknown>(
-  options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getDashboardOverview>>, TError, TData>>, request?: SecondParameter<typeof customInstance> }
-  , queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDashboardOverview>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useGetDashboardOverview<TData = Awaited<ReturnType<typeof getDashboardOverview>>, TError = unknown>(
-  options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getDashboardOverview>>, TError, TData>>, request?: SecondParameter<typeof customInstance> }
-  , queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDashboardOverview>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetDashboardOverviewQueryOptions(options)
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
@@ -403,42 +391,41 @@ export const getGetMonthlyTrendUrl = (params?: GetMonthlyTrendParams,) => {
 export const getMonthlyTrend = async (params?: GetMonthlyTrendParams, options?: Parameters<typeof customInstance>[1]): Promise<getMonthlyTrendResponse> => {
 
   return customInstance<getMonthlyTrendResponse>(getGetMonthlyTrendUrl(params),
-    {
-      ...options,
-      method: 'GET'
+  {
+    ...options,
+    method: 'GET'
 
 
-    }
-  );
-}
+  }
+);}
 
 
 
 
 
 export const getGetMonthlyTrendQueryKey = (params?: GetMonthlyTrendParams,) => {
-  return [
+    return [
     `/api/dashboard/monthly-trend`, ...(params ? [params] : [])
-  ] as const;
-}
+    ] as const;
+    }
 
 
-export const getGetMonthlyTrendQueryOptions = <TData = Awaited<ReturnType<typeof getMonthlyTrend>>, TError = unknown>(params?: GetMonthlyTrendParams, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMonthlyTrend>>, TError, TData>>, request?: SecondParameter<typeof customInstance> }
+export const getGetMonthlyTrendQueryOptions = <TData = Awaited<ReturnType<typeof getMonthlyTrend>>, TError = unknown>(params?: GetMonthlyTrendParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMonthlyTrend>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
-  const { query: queryOptions, request: requestOptions } = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetMonthlyTrendQueryKey(params);
-
-
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getMonthlyTrend>>> = ({ signal }) => getMonthlyTrend(params, { signal, ...requestOptions });
+  const queryKey =  queryOptions?.queryKey ?? getGetMonthlyTrendQueryKey(params);
 
 
 
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMonthlyTrend>>> = ({ signal }) => getMonthlyTrend(params, { signal, ...requestOptions });
 
 
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof getMonthlyTrend>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMonthlyTrend>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
 export type GetMonthlyTrendQueryResult = NonNullable<Awaited<ReturnType<typeof getMonthlyTrend>>>
@@ -446,42 +433,38 @@ export type GetMonthlyTrendQueryError = unknown
 
 
 export function useGetMonthlyTrend<TData = Awaited<ReturnType<typeof getMonthlyTrend>>, TError = unknown>(
-  params: undefined | GetMonthlyTrendParams, options: {
-    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMonthlyTrend>>, TError, TData>> & Pick<
-      DefinedInitialDataOptions<
-        Awaited<ReturnType<typeof getMonthlyTrend>>,
-        TError,
-        Awaited<ReturnType<typeof getMonthlyTrend>>
-      >, 'initialData'
-    >, request?: SecondParameter<typeof customInstance>
-  }
-  , queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+ params: undefined |  GetMonthlyTrendParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMonthlyTrend>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMonthlyTrend>>,
+          TError,
+          Awaited<ReturnType<typeof getMonthlyTrend>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetMonthlyTrend<TData = Awaited<ReturnType<typeof getMonthlyTrend>>, TError = unknown>(
-  params?: GetMonthlyTrendParams, options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMonthlyTrend>>, TError, TData>> & Pick<
-      UndefinedInitialDataOptions<
-        Awaited<ReturnType<typeof getMonthlyTrend>>,
-        TError,
-        Awaited<ReturnType<typeof getMonthlyTrend>>
-      >, 'initialData'
-    >, request?: SecondParameter<typeof customInstance>
-  }
-  , queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+ params?: GetMonthlyTrendParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMonthlyTrend>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMonthlyTrend>>,
+          TError,
+          Awaited<ReturnType<typeof getMonthlyTrend>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetMonthlyTrend<TData = Awaited<ReturnType<typeof getMonthlyTrend>>, TError = unknown>(
-  params?: GetMonthlyTrendParams, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMonthlyTrend>>, TError, TData>>, request?: SecondParameter<typeof customInstance> }
-  , queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+ params?: GetMonthlyTrendParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMonthlyTrend>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useGetMonthlyTrend<TData = Awaited<ReturnType<typeof getMonthlyTrend>>, TError = unknown>(
-  params?: GetMonthlyTrendParams, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMonthlyTrend>>, TError, TData>>, request?: SecondParameter<typeof customInstance> }
-  , queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+ params?: GetMonthlyTrendParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMonthlyTrend>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGetMonthlyTrendQueryOptions(params, options)
+  const queryOptions = getGetMonthlyTrendQueryOptions(params,options)
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
@@ -511,45 +494,44 @@ export const getGetLanguagePreferencesUrl = () => {
   return `/api/dashboard/language-preferences`
 }
 
-export const getLanguagePreferences = async (options?: Parameters<typeof customInstance>[1]): Promise<getLanguagePreferencesResponse> => {
+export const getLanguagePreferences = async ( options?: Parameters<typeof customInstance>[1]): Promise<getLanguagePreferencesResponse> => {
 
   return customInstance<getLanguagePreferencesResponse>(getGetLanguagePreferencesUrl(),
-    {
-      ...options,
-      method: 'GET'
+  {
+    ...options,
+    method: 'GET'
 
 
-    }
-  );
-}
+  }
+);}
 
 
 
 
 
 export const getGetLanguagePreferencesQueryKey = () => {
-  return [
+    return [
     `/api/dashboard/language-preferences`
-  ] as const;
-}
+    ] as const;
+    }
 
 
-export const getGetLanguagePreferencesQueryOptions = <TData = Awaited<ReturnType<typeof getLanguagePreferences>>, TError = unknown>(options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getLanguagePreferences>>, TError, TData>>, request?: SecondParameter<typeof customInstance> }
+export const getGetLanguagePreferencesQueryOptions = <TData = Awaited<ReturnType<typeof getLanguagePreferences>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLanguagePreferences>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
-  const { query: queryOptions, request: requestOptions } = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetLanguagePreferencesQueryKey();
-
-
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getLanguagePreferences>>> = ({ signal }) => getLanguagePreferences({ signal, ...requestOptions });
+  const queryKey =  queryOptions?.queryKey ?? getGetLanguagePreferencesQueryKey();
 
 
 
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getLanguagePreferences>>> = ({ signal }) => getLanguagePreferences({ signal, ...requestOptions });
 
 
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof getLanguagePreferences>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getLanguagePreferences>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
 export type GetLanguagePreferencesQueryResult = NonNullable<Awaited<ReturnType<typeof getLanguagePreferences>>>
@@ -557,42 +539,38 @@ export type GetLanguagePreferencesQueryError = unknown
 
 
 export function useGetLanguagePreferences<TData = Awaited<ReturnType<typeof getLanguagePreferences>>, TError = unknown>(
-  options: {
-    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getLanguagePreferences>>, TError, TData>> & Pick<
-      DefinedInitialDataOptions<
-        Awaited<ReturnType<typeof getLanguagePreferences>>,
-        TError,
-        Awaited<ReturnType<typeof getLanguagePreferences>>
-      >, 'initialData'
-    >, request?: SecondParameter<typeof customInstance>
-  }
-  , queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLanguagePreferences>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getLanguagePreferences>>,
+          TError,
+          Awaited<ReturnType<typeof getLanguagePreferences>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetLanguagePreferences<TData = Awaited<ReturnType<typeof getLanguagePreferences>>, TError = unknown>(
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getLanguagePreferences>>, TError, TData>> & Pick<
-      UndefinedInitialDataOptions<
-        Awaited<ReturnType<typeof getLanguagePreferences>>,
-        TError,
-        Awaited<ReturnType<typeof getLanguagePreferences>>
-      >, 'initialData'
-    >, request?: SecondParameter<typeof customInstance>
-  }
-  , queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLanguagePreferences>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getLanguagePreferences>>,
+          TError,
+          Awaited<ReturnType<typeof getLanguagePreferences>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetLanguagePreferences<TData = Awaited<ReturnType<typeof getLanguagePreferences>>, TError = unknown>(
-  options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getLanguagePreferences>>, TError, TData>>, request?: SecondParameter<typeof customInstance> }
-  , queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLanguagePreferences>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useGetLanguagePreferences<TData = Awaited<ReturnType<typeof getLanguagePreferences>>, TError = unknown>(
-  options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getLanguagePreferences>>, TError, TData>>, request?: SecondParameter<typeof customInstance> }
-  , queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLanguagePreferences>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetLanguagePreferencesQueryOptions(options)
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
@@ -632,42 +610,41 @@ export const getGetCategoryBreakdownUrl = (params?: GetCategoryBreakdownParams,)
 export const getCategoryBreakdown = async (params?: GetCategoryBreakdownParams, options?: Parameters<typeof customInstance>[1]): Promise<getCategoryBreakdownResponse> => {
 
   return customInstance<getCategoryBreakdownResponse>(getGetCategoryBreakdownUrl(params),
-    {
-      ...options,
-      method: 'GET'
+  {
+    ...options,
+    method: 'GET'
 
 
-    }
-  );
-}
+  }
+);}
 
 
 
 
 
 export const getGetCategoryBreakdownQueryKey = (params?: GetCategoryBreakdownParams,) => {
-  return [
+    return [
     `/api/dashboard/category-breakdown`, ...(params ? [params] : [])
-  ] as const;
-}
+    ] as const;
+    }
 
 
-export const getGetCategoryBreakdownQueryOptions = <TData = Awaited<ReturnType<typeof getCategoryBreakdown>>, TError = unknown>(params?: GetCategoryBreakdownParams, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoryBreakdown>>, TError, TData>>, request?: SecondParameter<typeof customInstance> }
+export const getGetCategoryBreakdownQueryOptions = <TData = Awaited<ReturnType<typeof getCategoryBreakdown>>, TError = unknown>(params?: GetCategoryBreakdownParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoryBreakdown>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
-  const { query: queryOptions, request: requestOptions } = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetCategoryBreakdownQueryKey(params);
-
-
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getCategoryBreakdown>>> = ({ signal }) => getCategoryBreakdown(params, { signal, ...requestOptions });
+  const queryKey =  queryOptions?.queryKey ?? getGetCategoryBreakdownQueryKey(params);
 
 
 
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCategoryBreakdown>>> = ({ signal }) => getCategoryBreakdown(params, { signal, ...requestOptions });
 
 
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof getCategoryBreakdown>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCategoryBreakdown>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
 export type GetCategoryBreakdownQueryResult = NonNullable<Awaited<ReturnType<typeof getCategoryBreakdown>>>
@@ -675,42 +652,38 @@ export type GetCategoryBreakdownQueryError = unknown
 
 
 export function useGetCategoryBreakdown<TData = Awaited<ReturnType<typeof getCategoryBreakdown>>, TError = unknown>(
-  params: undefined | GetCategoryBreakdownParams, options: {
-    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoryBreakdown>>, TError, TData>> & Pick<
-      DefinedInitialDataOptions<
-        Awaited<ReturnType<typeof getCategoryBreakdown>>,
-        TError,
-        Awaited<ReturnType<typeof getCategoryBreakdown>>
-      >, 'initialData'
-    >, request?: SecondParameter<typeof customInstance>
-  }
-  , queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+ params: undefined |  GetCategoryBreakdownParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoryBreakdown>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCategoryBreakdown>>,
+          TError,
+          Awaited<ReturnType<typeof getCategoryBreakdown>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetCategoryBreakdown<TData = Awaited<ReturnType<typeof getCategoryBreakdown>>, TError = unknown>(
-  params?: GetCategoryBreakdownParams, options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoryBreakdown>>, TError, TData>> & Pick<
-      UndefinedInitialDataOptions<
-        Awaited<ReturnType<typeof getCategoryBreakdown>>,
-        TError,
-        Awaited<ReturnType<typeof getCategoryBreakdown>>
-      >, 'initialData'
-    >, request?: SecondParameter<typeof customInstance>
-  }
-  , queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+ params?: GetCategoryBreakdownParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoryBreakdown>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCategoryBreakdown>>,
+          TError,
+          Awaited<ReturnType<typeof getCategoryBreakdown>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetCategoryBreakdown<TData = Awaited<ReturnType<typeof getCategoryBreakdown>>, TError = unknown>(
-  params?: GetCategoryBreakdownParams, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoryBreakdown>>, TError, TData>>, request?: SecondParameter<typeof customInstance> }
-  , queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+ params?: GetCategoryBreakdownParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoryBreakdown>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useGetCategoryBreakdown<TData = Awaited<ReturnType<typeof getCategoryBreakdown>>, TError = unknown>(
-  params?: GetCategoryBreakdownParams, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoryBreakdown>>, TError, TData>>, request?: SecondParameter<typeof customInstance> }
-  , queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+ params?: GetCategoryBreakdownParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoryBreakdown>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGetCategoryBreakdownQueryOptions(params, options)
+  const queryOptions = getGetCategoryBreakdownQueryOptions(params,options)
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
