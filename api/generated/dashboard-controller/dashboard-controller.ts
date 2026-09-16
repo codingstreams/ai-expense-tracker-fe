@@ -24,7 +24,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  CategoryBreakdownDto,
+  CategoryBreakdownResponse,
   DashboardOverviewResponseDto,
   GetCategoryBreakdownParams,
   GetLanguagePreferences200,
@@ -581,7 +581,7 @@ export function useGetLanguagePreferences<TData = Awaited<ReturnType<typeof getL
 
 
 export type getCategoryBreakdownResponse200 = {
-  data: CategoryBreakdownDto[]
+  data: CategoryBreakdownResponse
   status: 200
 }
 

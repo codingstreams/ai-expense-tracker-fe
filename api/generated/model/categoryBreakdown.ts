@@ -5,7 +5,7 @@
  * OpenAPI spec version: v0
  */
 
-export interface CategoryBreakdownDto {
+export interface CategoryBreakdown {
   categoryName?: string;
   totalAmount?: number;
   percentage?: number;

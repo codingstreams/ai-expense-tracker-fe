@@ -51,7 +51,7 @@ export default function OnboardingPage() {
             spendLimit: data.spendLimit,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             currency: data.currency as any,
-            paymentMode: data.paymentMode,
+            paymentMode: data.paymentModeId,
             isOnboardingComplete: true,
           },
           // eslint-disable-next-line @typescript-eslint/no-explicit-any

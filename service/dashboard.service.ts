@@ -7,7 +7,7 @@ export const dashboardService = {
   },
 
   async getDashboardSummary() {
-    return await apiClient<UserSummaryDto>('/dashboard/summary');
+    return await apiClient<SummaryDto>('/dashboard/summary');
   },
 
   async getMonthlyTrend() {

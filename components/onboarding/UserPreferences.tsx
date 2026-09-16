@@ -61,20 +61,15 @@ export default function UserPreferences() {
         <div>
           <label className="block text-xs font-medium uppercase tracking-wider text-zinc-400 mb-1.5">Preferred Payment Mode</label>
           <select
-            {...register("paymentMode")}
+            {...register("paymentModeId")}
             className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3.5 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
           >
             <option value="">Select Mode</option>
             {paymentModes.map((pm, idx) => {
-              return <option key={idx} value={pm.name}>{pm.name}</option>
+              return <option key={pm.id || idx} value={pm.id || pm.name}>{pm.name}</option>
             })}
-            {/* <option value="">Select Mode</option>
-            <option value="UPI">UPI</option>
-            <option value="CARD">Card</option>
-            <option value="NET_BANKING">Net Banking</option>
-            <option value="CASH">Cash</option> */}
           </select>
-          {errors.paymentMode && <p className="text-xs text-red-400 mt-1">{errors.paymentMode.message}</p>}
+          {errors.paymentModeId && <p className="text-xs text-red-400 mt-1">{errors.paymentModeId.message}</p>}
         </div>
       </div>
     </div>

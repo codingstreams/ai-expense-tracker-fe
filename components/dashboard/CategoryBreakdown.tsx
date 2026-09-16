@@ -37,7 +37,9 @@ import { Loader2 } from "lucide-react";
 
 export default function CategoryBreakdown() {
   const { data: response, isLoading } = useGetCategoryBreakdown();
-  const categories = response?.data || [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const rawData: any = response?.data;
+  const categories: any[] = Array.isArray(rawData) ? rawData : rawData?.content || [];
 
   const totalSpent = categories.reduce((acc, c) => acc + (c.totalAmount || 0), 0);
 

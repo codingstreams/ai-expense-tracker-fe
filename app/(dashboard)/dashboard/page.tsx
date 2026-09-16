@@ -19,12 +19,11 @@ export default function DashboardPage() {
 
       <UserSummary />
 
-      <MonthlyTrend data={dashboardOverview?.monthlyTrend ?? []} isLoading={isLoading} />
-
+      <MonthlyTrend />
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         <div className="lg:col-span-3">
-          <RecentTransactions data={dashboardOverview?.recentTransactions ?? []} isLoading={isLoading} />
+          <RecentTransactions />
         </div>
         <div className="lg:col-span-2">
           <CategoryBreakdown />

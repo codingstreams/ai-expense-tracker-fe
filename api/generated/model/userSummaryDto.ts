@@ -11,4 +11,6 @@ export interface UserSummaryDto {
   totalExpense?: number;
   netSavings?: number;
   dailyBurnRate?: number;
+  savingsRate?: number;
+  formattedSummary?: string;
 }

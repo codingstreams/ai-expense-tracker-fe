@@ -1,16 +1,18 @@
 "use client";
 
 import { useGetMonthlyTrend } from "@/api/generated/dashboard-controller/dashboard-controller";
+import { MonthlyTrendDto } from "@/api/generated/model";
 
 interface MonthlyTrendProps {
   variant?: "compact" | "detailed";
-  data: MonthlyTrendDto[];
-  isLoading: boolean;
+  data?: MonthlyTrendDto[];
+  isLoading?: boolean;
 }
 
-export default function MonthlyTrend({ variant = "compact" }: MonthlyTrendProps) {
-  const { data: response, isLoading: loading } = useGetMonthlyTrend();
-  const trends = response?.data || [];
+export default function MonthlyTrend({ variant = "compact", data: propData, isLoading: propLoading }: MonthlyTrendProps) {
+  const { data: response, isLoading: queryLoading } = useGetMonthlyTrend();
+  const trends = propData || response?.data || [];
+  const isLoading = propLoading !== undefined ? propLoading : queryLoading;
 
   const formatCurrency = (val: number) => {
     return new Intl.NumberFormat("en-IN", {

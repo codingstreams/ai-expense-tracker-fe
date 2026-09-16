@@ -1,3 +1,5 @@
+import { TransactionResponseDto } from "./transaction.dto";
+
 export interface CategoryBreakdownDto {
   categoryName: string;
   totalAmount: number;
@@ -23,7 +25,7 @@ export interface MonthlyTrendDto {
 }
 
 export interface DashboardOverviewResponseDto {
-  userSummary: UserSummaryDto;
+  userSummary: SummaryDto;
   monthlyTrend: MonthlyTrendDto[];
   recentTransactions: TransactionResponseDto[];
   categoryBreakdown: CategoryBreakdownDto[];
