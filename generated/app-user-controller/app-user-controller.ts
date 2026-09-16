@@ -30,7 +30,7 @@ import type {
   UserDetailsDto
 } from '../model';
 
-import { customInstance } from '../../../service/custom-instance';
+import { customInstance } from '../../service/custom-instance';
 
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];

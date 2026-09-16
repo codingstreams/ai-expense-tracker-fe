@@ -7,8 +7,8 @@ export default defineConfig({
     },
     output: {
       mode: 'tags-split',
-      target: './api/generated',
-      schemas: './api/generated/model',
+      target: './generated',
+      schemas: './generated/model',
       client: 'react-query',
       override: {
         mutator: {

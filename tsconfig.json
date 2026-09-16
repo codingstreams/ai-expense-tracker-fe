@@ -19,6 +19,9 @@
       }
     ],
     "paths": {
+      "@/api/generated/*": ["./generated/*"],
+      "@/api/generated": ["./generated"],
+      "@/generated/*": ["./generated/*"],
       "@/*": ["./*"]
     }
   },
