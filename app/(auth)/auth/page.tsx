@@ -5,6 +5,7 @@ import RegisterForm from "@/components/auth/RegisterForm";
 import { Zap, Sparkles, ArrowRight } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import packageInfo from "@/package.json";
 
 function AuthContent() {
   const router = useRouter();
@@ -24,6 +25,9 @@ function AuthContent() {
           {/* <Logo size={64} /> */}
 
           <span className="font-bold tracking-tight text-white text-lg">SpendAI</span>
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-purple-950/60 border border-purple-500/30 text-purple-300">
+            v{packageInfo.version}
+          </span>
         </div>
 
         <div className="max-w-md space-y-6 z-10">
@@ -61,11 +65,16 @@ function AuthContent() {
 
       <div className="flex w-full lg:w-1/2 flex-col justify-center items-center px-6 py-12 lg:px-16">
         <div className="w-full max-w-md space-y-6">
-          <div className="flex lg:hidden items-center gap-2 mb-6">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-600/20 border border-purple-500/30 text-purple-400">
-              <Sparkles className="h-4 w-4" />
+          <div className="flex lg:hidden items-center justify-between mb-6">
+            <div className="flex items-center gap-2">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-600/20 border border-purple-500/30 text-purple-400">
+                <Sparkles className="h-4 w-4" />
+              </div>
+              <span className="font-bold text-white text-lg">SpendAI</span>
             </div>
-            <span className="font-bold text-white text-lg">SpendAI</span>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-purple-950/60 border border-purple-500/30 text-purple-300">
+              v{packageInfo.version}
+            </span>
           </div>
 
           {isLogin ? <LoginForm /> : <RegisterForm />}
