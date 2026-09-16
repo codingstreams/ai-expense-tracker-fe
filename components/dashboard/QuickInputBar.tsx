@@ -33,6 +33,9 @@ export default function QuickInputBar() {
   const [modalType, setModalType] = useState<"EXPENSE" | "INCOME" | "TRANSFER">("EXPENSE");
   const [processing, setProcessing] = useState(false);
   const unsubscribeRef = useRef<(() => void) | null>(null);
+  const [query, setQuery] = useState<string>("");
+
+  const { mutateAsync: parseRawTextMutate } = useParseRawText();
 
   const { mutateAsync: parseRawTextMutate } = useParseRawText();
 
@@ -61,7 +64,7 @@ export default function QuickInputBar() {
 
   const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
-    if (!nlQuery.trim() || processing) return;
+    if (!query.trim() || processing) return;
 
     try {
       setProcessing(true);
@@ -113,9 +116,9 @@ export default function QuickInputBar() {
             </div>
             <input
               type="text"
-              value={nlQuery}
+              value={query}
               disabled={processing}
-              onChange={(e) => setNlQuery(e.target.value)}
+              onChange={(e) => setQuery(e.target.value)}
               placeholder={
                 processing
                   ? "AI is parsing and logging your transaction..."
@@ -125,7 +128,7 @@ export default function QuickInputBar() {
             />
             <button
               type="submit"
-              disabled={processing || !nlQuery.trim()}
+              disabled={processing || !query.trim()}
               className="absolute right-2 px-2.5 py-2 text-xs font-semibold rounded-lg bg-purple-600/30 text-purple-300 border border-purple-500/30 hover:bg-purple-600/50 flex items-center gap-1 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {processing ? (

@@ -157,8 +157,8 @@ export default function ChatWidget() {
               <div key={idx} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
                 <div
                   className={`max-w-[85%] p-2.5 rounded-xl whitespace-pre-wrap leading-relaxed ${m.role === "user"
-                      ? "bg-purple-600 text-white"
-                      : "bg-zinc-950 border border-zinc-800 text-zinc-200"
+                    ? "bg-purple-600 text-white"
+                    : "bg-zinc-950 border border-zinc-800 text-zinc-200"
                     }`}
                 >
                   {m.text}

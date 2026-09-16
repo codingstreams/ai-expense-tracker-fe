@@ -8,8 +8,8 @@ import { useMutation } from '@tanstack/react-query';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useRouter } from 'next/navigation';
 import { Lock, Mail, User, Loader2, AlertCircle } from 'lucide-react';
-import { z } from 'zod';
-import { authService } from '@/services/auth.service';
+import { RegisterFormValues, registerSchema } from '@/validations/auth';
+import { authService } from '@/service/auth.service';
 
 export default function RegisterForm() {
   const router = useRouter();

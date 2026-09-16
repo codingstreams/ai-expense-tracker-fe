@@ -1,4 +1,3 @@
-import { apiClient } from "@/lib/apiClients";
 import { AccountDto, BankDto } from "@/types/onboarding.dto";
 import { CardDto } from "@/types/transaction.dto";
 import { customInstance } from "./custom-instance";
@@ -43,23 +42,6 @@ export const accountService = {
 
   async deleteAccount(id: string): Promise<void> {
     await deleteAccountApi(id);
-  },
-
-  async getUserAccounts(paymentMode?: string) {
-    const query = paymentMode ? `?paymentMode=${encodeURIComponent(paymentMode)}` : '';
-    return await apiClient<AccountDto[]>(`/accounts${query}`, {
-      headers: {
-        'X-API-Version': '2'
-      }
-    });
-  },
-
-  async getDebitCards() {
-    return await apiClient<CardDto[]>('/cards?type=DEBIT_CARD');
-  },
-
-  async getCreditCards() {
-    return await apiClient<CardDto[]>('/cards?type=CREDIT_CARD');
   },
 
   async addCard(payload: {

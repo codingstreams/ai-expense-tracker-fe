@@ -156,6 +156,7 @@ export default function TransactionModal({
   ];
 
   const handleTabChange = (newType: "EXPENSE" | "INCOME" | "TRANSFER") => {
+    setTransactionType(newType);
     setValue("type", newType);
     setValue("accountId", "");
     setValue("toAccountId", "");

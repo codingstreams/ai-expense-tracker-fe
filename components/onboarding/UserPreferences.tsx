@@ -1,0 +1,77 @@
+"use client";
+
+import { useFormContext } from "react-hook-form";
+import { OnboardingFormValues } from "@/validations/onboarding";
+import { useGetLanguagePreferences } from "@/api/generated/dashboard-controller/dashboard-controller";
+import { useGetPaymentModes } from "@/api/generated/payment-mode-controller/payment-mode-controller";
+
+export default function UserPreferences() {
+  const { register, formState: { errors } } = useFormContext<OnboardingFormValues>();
+  
+  const { data: langData } = useGetLanguagePreferences();
+  const { data: paymentModesData } = useGetPaymentModes();
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const languages: string[] = (langData?.data as any)?.options || ["EN", "HI", "ES", "FR"];
+  const paymentModes = paymentModesData?.data || [];
+
+  return (
+    <div className="p-6 rounded-2xl border border-zinc-800 bg-zinc-900 shadow-2xl space-y-5">
+      <div className="border-b border-zinc-800/80 pb-3">
+        <h2 className="text-lg font-bold text-white tracking-tight">Preferences</h2>
+        <p className="text-xs text-zinc-400">Set your default currency, language, and spending limits.</p>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-xs font-medium uppercase tracking-wider text-zinc-400 mb-1.5">Language</label>
+          <select
+            {...register("languagePreference")}
+            className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3.5 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+          >
+            {languages.map((lang) => (
+              <option key={lang} value={lang.slice(0, 2).toUpperCase()}>{lang}</option>
+            ))}
+          </select>
+          {errors.languagePreference && <p className="text-xs text-red-400 mt-1">{errors.languagePreference.message}</p>}
+        </div>
+
+        <div>
+          <label className="block text-xs font-medium uppercase tracking-wider text-zinc-400 mb-1.5">Currency</label>
+          <select
+            {...register("currency")}
+            className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3.5 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+            disabled >
+            <option value="INR">INR (₹)</option>
+          </select>
+          {errors.currency && <p className="text-xs text-red-400 mt-1">{errors.currency.message}</p>}
+        </div>
+
+        <div>
+          <label className="block text-xs font-medium uppercase tracking-wider text-zinc-400 mb-1.5">Monthly Spend Limit</label>
+          <input
+            type="number"
+            {...register("spendLimit", { valueAsNumber: true })}
+            placeholder="5000"
+            className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3.5 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+          />
+          {errors.spendLimit && <p className="text-xs text-red-400 mt-1">{errors.spendLimit.message}</p>}
+        </div>
+
+        <div>
+          <label className="block text-xs font-medium uppercase tracking-wider text-zinc-400 mb-1.5">Preferred Payment Mode</label>
+          <select
+            {...register("paymentModeId")}
+            className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3.5 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+          >
+            <option value="">Select Mode</option>
+            {paymentModes.map((pm, idx) => {
+              return <option key={pm.id || idx} value={pm.id || pm.name}>{pm.name}</option>
+            })}
+          </select>
+          {errors.paymentModeId && <p className="text-xs text-red-400 mt-1">{errors.paymentModeId.message}</p>}
+        </div>
+      </div>
+    </div>
+  );
+}

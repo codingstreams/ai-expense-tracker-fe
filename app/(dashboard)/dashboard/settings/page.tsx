@@ -1,9 +1,10 @@
 "use client";
 
-import PreferencesSection from "@/components/settings/PreferencesSection";
-import CashSection from "@/components/settings/CashSection";
-import AccountsSection from "@/components/settings/AccountsSection";
-import CardsSection from "@/components/settings/CardsSection";
+import AccountsSection from "@/components/dashboard/settings/AccountsSection";
+import CardsSection from "@/components/dashboard/settings/CardsSection";
+import CashSection from "@/components/dashboard/settings/CashSection";
+import PreferencesSection from "@/components/dashboard/settings/PreferencesSection";
+
 
 export default function SettingsPage() {
   return (

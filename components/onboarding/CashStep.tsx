@@ -1,7 +1,7 @@
 "use client";
 
+import { OnboardingFormValues } from "@/validations/onboarding";
 import { useFormContext } from "react-hook-form";
-import { OnboardingFormValues } from "@/lib/validations/onboarding";
 
 export default function CashStep() {
   const { register, watch, formState: { errors } } = useFormContext<OnboardingFormValues>();

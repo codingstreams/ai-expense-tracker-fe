@@ -4,7 +4,7 @@
  * OpenAPI definition
  * OpenAPI spec version: v0
  */
-import type { CategoryBreakdownDto } from './categoryBreakdownDto';
+import type { CategoryBreakdownResponse } from './categoryBreakdownResponse';
 import type { MonthlyTrendDto } from './monthlyTrendDto';
 import type { TransactionDetailsResponse } from './transactionDetailsResponse';
 import type { UserSummaryDto } from './userSummaryDto';
@@ -13,5 +13,5 @@ export interface DashboardOverviewResponseDto {
   userSummary?: UserSummaryDto;
   monthlyTrend?: MonthlyTrendDto[];
   recentTransactions?: TransactionDetailsResponse[];
-  categoryBreakdown?: CategoryBreakdownDto[];
+  categoryBreakdown?: CategoryBreakdownResponse;
 }

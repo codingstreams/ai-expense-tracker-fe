@@ -17,7 +17,7 @@ export function proxy(request: NextRequest) {
       if (authData) {
         token = authData.accessToken;
         isOnboarded = Boolean(authData.onboarded ?? authData.isOnboarded ?? authData.isOnbaorded);
-        
+
         if (Date.now() >= authData.expireAt) {
           isExpired = true;
         }
@@ -29,7 +29,7 @@ export function proxy(request: NextRequest) {
 
   if ((pathname.startsWith('/dashboard') || pathname.startsWith('/onboarding')) && (!token || isExpired)) {
     const response = NextResponse.redirect(new URL('/auth?mode=login', request.url));
-    
+
     if (isExpired) {
       response.cookies.delete('auth-storage');
     }
